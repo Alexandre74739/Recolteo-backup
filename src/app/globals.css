@@ -19,13 +19,6 @@
   --color-lime: #c9f242;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -34,7 +27,7 @@ body {
 
 @layer base {
   body {
-    padding-top: 64px;
+    padding-top: 80px;
     font-family: Arial, sans-serif;
     font-size: 1rem;
     line-height: 1.5;

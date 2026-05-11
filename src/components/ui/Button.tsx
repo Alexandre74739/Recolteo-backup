@@ -13,12 +13,14 @@ interface ButtonProps {
   label: string;
   href: string;
   variant?: Variant;
+  showArrow?: boolean;
 }
 
 export default function Button({
   label,
   href,
-  variant
+  variant,
+  showArrow = true,
 }: ButtonProps) {
   const variantStyles =
     variant === "sapin"
@@ -39,10 +41,12 @@ export default function Button({
       className={`group inline-flex items-center gap-3 px-7 py-3.5 rounded-xl font-semibold transition-colors ${variantStyles}`}
     >
       {label}
-      <ArrowRight
-        size={20}
-        className="transition-transform duration-200 group-hover:translate-x-1"
-      />
+      {showArrow && (
+        <ArrowRight
+          size={20}
+          className="transition-transform duration-200 group-hover:translate-x-1"
+        />
+      )}
     </Link>
   );
 }
