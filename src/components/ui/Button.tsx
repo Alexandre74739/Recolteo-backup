@@ -1,7 +1,7 @@
 export default function Btns() {
     return (
         <div>
-            <button className="bg-color-sapin">
+            <button>
                 Click moi
             </button>
         </div>
@@ -15,12 +15,19 @@ interface ButtonProps {
   variant?: "primary" | "secondary" | "tertiary" | "foruthary";
 }
 
+const variants = {
+  primary: "bg-color-sapin",
+  secondary:  "bg-color-cream",
+  tertiary: "bg-color-peach",
+  foruthary: "bg-color-lime",
+};
+
 const Button = ({ label, onClick, disabled = false, variant = "primary" }: ButtonProps) => {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`btn btn-${variant}`}
+      className={`${variants[variant]} px-4 py-2 rounded transition-colors`}
     >
       {label}
     </button>
