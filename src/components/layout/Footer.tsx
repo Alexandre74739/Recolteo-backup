@@ -31,10 +31,7 @@ export default function Footer() {
               <span className="text-lime italic">la différence ?</span>
             </h2>
           </div>
-          <div className="flex flex-row flex-wrap gap-3 shrink-0">
             <Btn label="Créer un compte" href="/inscription" variant="lime" />
-            <Btn label="En savoir plus" href="/about" variant="peach" />
-          </div>
         </div>
       </div>
 
