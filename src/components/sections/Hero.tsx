@@ -1,4 +1,5 @@
 import Btn from "../ui/Button";
+import Reveal from "../animations/Reveal";
 
 interface HeroProps {
   title: string;
@@ -24,27 +25,33 @@ export default function Hero({
   return (
     <section className="px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-28">
       <div className="max-w-3xl mx-auto text-center">
-        <h1 className="text-sapin font-black mb-6">
-          {title}
-          <br />
-          {subtitle}{" "}
-          <span className="relative italic whitespace-nowrap">
-            <span
-              className="absolute inset-0 bg-lime rounded-xl -rotate-1 scale-x-110"
-              aria-hidden="true"
-            />
-            <span className="relative">{labelTitle}</span>
-          </span>
-          <br />
-          <span className="italic text-peach">{spanTitle}</span> {endTitle}
-        </h1>
+        <Reveal delay={0}>
+          <h1 className="text-sapin font-black mb-6">
+            {title}
+            <br />
+            {subtitle}{" "}
+            <span className="relative italic whitespace-nowrap">
+              <span
+                className="absolute inset-0 bg-lime rounded-xl -rotate-1 scale-x-110"
+                aria-hidden="true"
+              />
+              <span className="relative">{labelTitle}</span>
+            </span>
+            <br />
+            <span className="italic text-peach">{spanTitle}</span> {endTitle}
+          </h1>
+        </Reveal>
 
-        <p className="text-sapin max-w-xl mx-auto mb-10">{description}</p>
+        <Reveal delay={0.15}>
+          <p className="text-sapin max-w-xl mx-auto mb-10">{description}</p>
+        </Reveal>
 
-        <div className="flex items-center justify-center gap-4 flex-wrap">
-          <Btn label={primaryButton} href="./" variant="sapin" />
-          <Btn label={secondaryButton} href="./" variant="peach" />
-        </div>
+        <Reveal delay={0.3}>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <Btn label={primaryButton} href="./" variant="sapin" />
+            <Btn label={secondaryButton} href="./" variant="peach" />
+          </div>
+        </Reveal>
       </div>
     </section>
   );

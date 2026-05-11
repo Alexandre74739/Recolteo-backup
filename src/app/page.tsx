@@ -1,5 +1,5 @@
 import Hero from "../components/sections/Hero";
-import Btns from "../components/ui/Button";
+import Categories from "../components/sections/Categories";
 
 export default function Home() {
   return (
@@ -11,10 +11,11 @@ export default function Home() {
           labelTitle="vraiment"
           spanTitle="proche"
           endTitle="de chez vous"
-          description="Recolteo connecte commerçants et associations pour une solidarité simple et gratuite. Une action où tout le monde y gagne."
+          description="Recolteo connecte commerçants et associations pour une solidarité simple et rapide. Une action où tout le monde y gagne."
           primaryButton="Explorer la plateforme"
           secondaryButton="Voir une démo en 90s"
         />
+        <Categories />
       </main>
     </div>
   );
