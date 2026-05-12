@@ -18,7 +18,6 @@ export default function Header() {
   return (
     <div className="fixed top-3 left-0 right-0 z-50 px-4">
       <header className="max-w-7xl mx-auto bg-cream/90 backdrop-blur-sm border-2 border-sapin/10 rounded-2xl shadow-sm overflow-hidden">
-
         <div className="px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           <Link
             href="/"
@@ -49,7 +48,13 @@ export default function Header() {
             </Link>
 
             <div className="hidden sm:block">
-              <Btn label="Se connecter" href="/login" variant="sapin" size="sm" showArrow={false} />
+              <Btn
+                label="Se connecter"
+                href="/login"
+                variant="sapin"
+                size="sm"
+                showArrow={false}
+              />
             </div>
 
             <button
@@ -75,11 +80,16 @@ export default function Header() {
               </Link>
             ))}
             <div className="mt-2 pt-3 border-t border-sapin/10">
-              <Btn label="Se connecter" href="/login" variant="sapin" size="sm" showArrow={false} />
+              <Btn
+                label="Se connecter"
+                href="/login"
+                variant="sapin"
+                size="sm"
+                showArrow={false}
+              />
             </div>
           </div>
         )}
-
       </header>
     </div>
   );
