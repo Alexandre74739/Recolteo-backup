@@ -2,10 +2,10 @@ import Link from "next/link";
 import Btn from "../ui/Button";
 
 const navLinks = [
+  { label: "Accueil", href: "/" },
+  { label: "Découvrir Récoltéo", href: "/decouvrir-recolteo" },
   { label: "Dashboard", href: "/dashboard" },
-  { label: "À propos", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "Blog", href: "/blog" },
 ];
 
 const legalLinks = [

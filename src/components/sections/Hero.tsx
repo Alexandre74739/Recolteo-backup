@@ -9,7 +9,9 @@ interface HeroProps {
   endTitle: string;
   description: string;
   primaryButton: string;
+  primaryButtonHref: string;
   secondaryButton: string;
+  secondaryButtonHref: string;
 }
 
 export default function Hero({
@@ -20,7 +22,9 @@ export default function Hero({
   endTitle,
   description,
   primaryButton,
+  primaryButtonHref,
   secondaryButton,
+  secondaryButtonHref
 }: HeroProps) {
   return (
     <section className="px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-28">
@@ -48,8 +52,8 @@ export default function Hero({
 
         <Reveal delay={0.3}>
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Btn label={primaryButton} href="./" variant="sapin" />
-            <Btn label={secondaryButton} href="./" variant="peach" />
+            <Btn label={primaryButton} href={primaryButtonHref} variant="sapin" />
+            <Btn label={secondaryButton} href={secondaryButtonHref} variant="peach" />
           </div>
         </Reveal>
       </div>

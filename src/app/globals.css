@@ -17,6 +17,9 @@
   --color-cream: #fef9dc;
   --color-peach: #f16012;
   --color-lime: #c9f242;
+
+  --animate-loading-bar: loading-bar 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-letter-wave: letter-wave 1.8s ease infinite;
 }
 
 body {
@@ -85,6 +88,28 @@ body {
 
   button {
     cursor: pointer;
+  }
+}
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes letter-wave {
+  0%,
+  45%,
+  100% {
+    transform: translateY(0) scale(1);
+    color: var(--color-sapin);
+  }
+  22% {
+    transform: translateY(-26px) scale(1.08);
+    color: var(--color-lime);
   }
 }
 

@@ -22,7 +22,7 @@ export default function NotFound() {
       </Reveal>
 
       <Reveal delay={0.45}>
-        <p className="text-peach/70 italic">
+        <p className="text-peach/70 italic font-bold">
           "Ce n'est pas votre faute... enfin, peut-être un peu."
         </p>
       </Reveal>
