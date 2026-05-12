@@ -14,7 +14,9 @@ export default function Home() {
           endTitle="de chez vous"
           description="Recolteo connecte commerçants et associations pour une solidarité simple et rapide. Une action où tout le monde y gagne."
           primaryButton="Explorer la plateforme"
-          secondaryButton="Voir une démo en 90s"
+          primaryButtonHref="./decouvrir-recolteo"
+          secondaryButton="Profiter des offres"
+          secondaryButtonHref="./dashboard"
         />
         <Categories />
         <HowItWorks />

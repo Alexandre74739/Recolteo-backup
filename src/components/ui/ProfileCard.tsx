@@ -1,4 +1,11 @@
-import { Gift, Users, FileText, MapPin, Send, CheckCircle } from "@deemlol/next-icons";
+import {
+  Gift,
+  Users,
+  FileText,
+  MapPin,
+  Send,
+  CheckCircle,
+} from "@deemlol/next-icons";
 import StepItem from "./StepItem";
 import Btn from "./Button";
 import type { ProfileDef, IconName } from "../../lib/how-it-works";
@@ -13,13 +20,18 @@ const iconMap: Record<IconName, ReactNode> = {
   CheckCircle: <CheckCircle size={20} />,
 };
 
-export default function ProfileCard({ role, subtitle, accent, cta, steps }: ProfileDef) {
+export default function ProfileCard({
+  role,
+  subtitle,
+  accent,
+  cta,
+  steps,
+}: ProfileDef) {
   const isSapin = accent === "sapin";
   const headerBg = isSapin ? "bg-sapin" : "bg-peach";
   const btnVariant = isSapin ? "sapin-outline" : "peach-outline";
   return (
     <div className="rounded-2xl overflow-hidden shadow-md flex flex-col">
-
       <div className={`${headerBg} px-6 pt-6 pb-8 sm:px-8 sm:pt-7`}>
         <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-bold tracking-wide mb-4 bg-cream/15 text-cream">
           {role}
@@ -42,10 +54,14 @@ export default function ProfileCard({ role, subtitle, accent, cta, steps }: Prof
         </div>
 
         <div className="px-6 sm:px-8 py-5">
-          <Btn label={cta.label} href={cta.href} variant={btnVariant} size="sm" />
+          <Btn
+            label={cta.label}
+            href="./dashboard"
+            variant={btnVariant}
+            size="sm"
+          />
         </div>
       </div>
-
     </div>
   );
 }

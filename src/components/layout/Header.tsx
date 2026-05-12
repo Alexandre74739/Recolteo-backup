@@ -6,10 +6,10 @@ import { ShoppingBag, Menu, X } from "@deemlol/next-icons";
 import Btn from "../ui/Button";
 
 const navLinks = [
-  { label: "Marché", href: "/marche" },
-  { label: "Producteurs", href: "/producteurs" },
-  { label: "Saison", href: "/saison" },
-  { label: "Journal", href: "/journal" },
+  { label: "Accueil", href: "/" },
+  { label: "Découvrir Récoltéo", href: "/decouvrir-recolteo" },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Header() {
