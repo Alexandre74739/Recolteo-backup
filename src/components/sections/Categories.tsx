@@ -20,7 +20,7 @@ export default function Categories() {
             </h2>
           </Reveal>
           <Reveal delay={0.24}>
-            <p className="text-sapin/60 max-w-md mb-8">
+            <p className="text-sapin max-w-md mb-8">
               Invendus, matériel inutilisé, produits frais, chaque ressource
               trouve preneur à quelques rues de chez vous. Simple, rapide et
               immédiat.

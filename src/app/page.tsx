@@ -1,5 +1,6 @@
 import Hero from "../components/sections/Hero";
 import Categories from "../components/sections/Categories";
+import HowItWorks from "../components/sections/HowItWorks";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
           secondaryButton="Voir une démo en 90s"
         />
         <Categories />
+        <HowItWorks />
       </main>
     </div>
   );

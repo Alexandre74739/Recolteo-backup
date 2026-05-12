@@ -1,0 +1,32 @@
+import { ReactNode } from "react";
+
+interface StepItemProps {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  isLast: boolean;
+  accent: "sapin" | "peach";
+}
+
+export default function StepItem({ icon, title, description, isLast, accent }: StepItemProps) {
+  const bubble = accent === "sapin" ? "bg-sapin/8 text-sapin" : "bg-peach/10 text-peach";
+  const dashed = accent === "sapin" ? "border-sapin/15" : "border-peach/20";
+
+  return (
+    <div className="flex gap-4">
+      <div className="flex flex-col items-center shrink-0">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${bubble}`}>
+          {icon}
+        </div>
+        {!isLast && (
+          <div className={`flex-1 my-2 border-l border-dashed ${dashed}`} />
+        )}
+      </div>
+
+      <div className={isLast ? "pb-0" : "pb-7"}>
+        <p className="font-bold text-sm text-sapin mb-1 leading-snug">{title}</p>
+        <p className="text-sm text-sapin/50 leading-relaxed">{description}</p>
+      </div>
+    </div>
+  );
+}

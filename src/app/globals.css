@@ -17,13 +17,9 @@
   --color-cream: #fef9dc;
   --color-peach: #f16012;
   --color-lime: #c9f242;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --animate-loading-bar: loading-bar 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-letter-wave: letter-wave 1.8s ease infinite;
 }
 
 body {
@@ -34,7 +30,7 @@ body {
 
 @layer base {
   body {
-    padding-top: 64px;
+    padding-top: 80px;
     font-family: Arial, sans-serif;
     font-size: 1rem;
     line-height: 1.5;
@@ -92,6 +88,28 @@ body {
 
   button {
     cursor: pointer;
+  }
+}
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes letter-wave {
+  0%,
+  45%,
+  100% {
+    transform: translateY(0) scale(1);
+    color: var(--color-sapin);
+  }
+  22% {
+    transform: translateY(-26px) scale(1.08);
+    color: var(--color-lime);
   }
 }
 
