@@ -14,7 +14,7 @@ export default function VideoDemo() {
   const demo = demos[active];
 
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+    <section id="videodemo" className="px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
       <div className="max-w-7xl mx-auto flex flex-col gap-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="max-w-xl">
