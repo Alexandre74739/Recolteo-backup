@@ -31,7 +31,7 @@ export default function Footer() {
               <span className="text-lime italic">la différence ?</span>
             </h2>
           </div>
-            <Btn label="Créer un compte" href="/inscription" variant="lime" />
+            <Btn label="Créer un compte" href="/login" variant="lime" />
         </div>
       </div>
 

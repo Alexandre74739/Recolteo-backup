@@ -12,7 +12,7 @@ export default function ValueCard({
   description,
 }: ValueCardProps) {
   return (
-    <div className="flex items-start gap-5 bg-white border border-sapin/8 rounded-2xl px-6 py-5 transition-transform duration-200 hover:translate-x-1.5 hover:-translate-y-1">
+    <div className="flex items-start gap-5 bg-lime/5 border border-sapin rounded-2xl px-6 py-5 transition-all duration-200 hover:-translate-y-2">
       <div className="w-10 h-10 bg-lime rounded-xl flex items-center justify-center shrink-0 text-sapin mt-0.5">
         {icon}
       </div>

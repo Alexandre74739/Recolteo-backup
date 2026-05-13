@@ -19,7 +19,7 @@ export default function CtaBanner({
         <p className="text-lime font-black text-2xl sm:text-3xl leading-snug mb-2">
           {heading}
         </p>
-        <p className="text-cream/60 text-sm">{subheading}</p>
+        <p className="text-cream text-base">{subheading}</p>
       </div>
       <Button label={buttonLabel} href={buttonHref} variant="lime" />
     </div>

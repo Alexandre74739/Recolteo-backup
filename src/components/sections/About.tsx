@@ -41,11 +41,11 @@ export default function About() {
           </div>
 
           <Reveal delay={0.3}>
-            <div className="grid grid-cols-3 divide-x divide-sapin/10 border border-sapin/10 rounded-2xl overflow-hidden">
+            <div className="grid grid-cols-3 divide-x divide-sapin/10 border border-sapin rounded-2xl overflow-hidden">
               {aboutStats.map((stat) => (
                 <div
                   key={stat.label}
-                  className="px-6 py-7 text-center bg-white"
+                  className="px-6 py-7 text-center bg-lime/5"
                 >
                   <p className="text-3xl sm:text-4xl font-black text-sapin leading-none">
                     {stat.value}
