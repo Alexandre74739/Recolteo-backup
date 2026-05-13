@@ -22,9 +22,9 @@ export default function SlideIn({
         transition={{
           delay,
           type: "spring",
-          stiffness: 220,
-          damping: 22,
-          mass: 1.2,
+          stiffness: 280,
+          damping: 16,
+          mass: 1.0,
         }}
       >
         {children}

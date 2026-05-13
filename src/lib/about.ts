@@ -34,7 +34,7 @@ export const aboutValues: AboutValue[] = [
     icon: "Shield",
     title: "Conformité garantie",
     description:
-      "Récoltéo génère automatiquement les documents légaux requis —avec un formulaire CERFA personnalisé, sans erreur ni délai.",
+      "Récoltéo génère automatiquement les documents légaux requis avec un formulaire CERFA personnalisé, sans erreur ni délai.",
   },
   {
     icon: "Heart",
