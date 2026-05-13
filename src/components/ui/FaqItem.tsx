@@ -7,7 +7,12 @@ interface FaqItemProps {
   onToggle: () => void;
 }
 
-export default function FaqItem({ question, answer, isOpen, onToggle }: FaqItemProps) {
+export default function FaqItem({
+  question,
+  answer,
+  isOpen,
+  onToggle,
+}: FaqItemProps) {
   return (
     <div className="border-b border-sapin/10">
       <button
@@ -15,11 +20,11 @@ export default function FaqItem({ question, answer, isOpen, onToggle }: FaqItemP
         onClick={onToggle}
         aria-expanded={isOpen}
       >
-        <span className="text-sapin font-semibold text-base leading-snug group-hover:text-sapin/70 transition-colors">
+        <span className="text-sapin font-bold leading-snug group-hover:text-sapin/70 transition-colors">
           {question}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-sapin/50 shrink-0 transition-transform duration-300 ${
+          className={`w-6 h-6 text-sapin font-bold shrink-0 transition-transform duration-300 ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -31,7 +36,7 @@ export default function FaqItem({ question, answer, isOpen, onToggle }: FaqItemP
         }`}
       >
         <div className="overflow-hidden">
-          <p className="text-sapin/60 text-base leading-relaxed pb-5">{answer}</p>
+          <p className="text-sapin text-base leading-relaxed pb-5">{answer}</p>
         </div>
       </div>
     </div>
