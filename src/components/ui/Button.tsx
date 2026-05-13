@@ -44,18 +44,26 @@ export default function Button({
       ? "px-4 py-2 text-sm rounded-lg gap-2"
       : "px-7 py-3.5 rounded-xl gap-3";
 
+  const className = `group inline-flex items-center font-semibold transition-all active:scale-95 ${sizeStyles} ${variantStyles}`;
+  const arrow = showArrow && (
+    <ArrowRight
+      size={size === "sm" ? 15 : 20}
+      className="transition-transform duration-200 group-hover:translate-x-1"
+    />
+  );
+
+  if (href.startsWith("#"))
+    return (
+      <a href={href} className={className}>
+        {label}
+        {arrow}
+      </a>
+    );
+
   return (
-    <Link
-      href={href}
-      className={`group inline-flex items-center font-semibold transition-all active:scale-95 ${sizeStyles} ${variantStyles}`}
-    >
+    <Link href={href} className={className}>
       {label}
-      {showArrow && (
-        <ArrowRight
-          size={size === "sm" ? 15 : 20}
-          className="transition-transform duration-200 group-hover:translate-x-1"
-        />
-      )}
+      {arrow}
     </Link>
   );
 }

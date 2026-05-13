@@ -27,7 +27,7 @@ export default function About() {
                     className="absolute inset-0 bg-lime rounded-lg -rotate-1 scale-x-110"
                     aria-hidden="true"
                   />
-                  <span className="relative">une seconde vie.</span>
+                  <span className="relative">une seconde vie</span>
                 </span>
               </h2>
             </Reveal>
