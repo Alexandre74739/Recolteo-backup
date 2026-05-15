@@ -22,7 +22,7 @@ const legalLinks = [
 export default function Footer() {
   return (
     <footer className=" text-cream mt-auto">
-      <div style={{ position: "relative", width: "100%", height: "64px" }}>
+      <div className="relative w-full h-16 pointer-events-none select-none" inert>
         <Image
           src={footerIllustration}
           alt=""
