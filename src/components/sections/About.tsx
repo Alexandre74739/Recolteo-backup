@@ -5,6 +5,7 @@ import SlideIn from "../animations/SlideIn";
 import CtaBanner from "../ui/CtaBanner";
 import ValueCard from "../ui/ValueCard";
 import { aboutStats, aboutValues, type AboutValueKey } from "@/src/lib/about";
+import { AboutDecorations } from "../illustrations/assetsIllustrations";
 
 const iconMap: Record<AboutValueKey, ReactNode> = {
   Zap: <Zap size={20} />,
@@ -15,8 +16,9 @@ const iconMap: Record<AboutValueKey, ReactNode> = {
 
 export default function About() {
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-      <div className="max-w-7xl mx-auto flex flex-col gap-20">
+    <section className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-28 overflow-hidden">
+      <AboutDecorations />
+      <div className="relative max-w-7xl mx-auto flex flex-col gap-20">
         <div className="flex flex-col gap-10">
           <div className="max-w-xl">
             <Reveal delay={0.1}>

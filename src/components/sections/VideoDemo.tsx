@@ -8,14 +8,16 @@ import SlideIn from "../animations/SlideIn";
 import TabToggle from "../ui/TabToggle";
 import VideoPlayer from "../ui/VideoPlayer";
 import { demos, tabs, type UserType } from "@/src/lib/videoDemo";
+import { VideoDemoDecorations } from "../illustrations/assetsIllustrations";
 
 export default function VideoDemo() {
   const [active, setActive] = useState<UserType>("commercant");
   const demo = demos[active];
 
   return (
-    <section id="videodemo" className="px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-      <div className="max-w-7xl mx-auto flex flex-col gap-10">
+    <section id="videodemo" className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-28 overflow-hidden">
+      <VideoDemoDecorations />
+      <div className="relative max-w-7xl mx-auto flex flex-col gap-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="max-w-xl">
             <Reveal delay={0.1}>
@@ -80,6 +82,7 @@ export default function VideoDemo() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.18 }}
+                className="max-w-xl ml-auto"
               >
                 <VideoPlayer src={demo.src} />
               </motion.div>
