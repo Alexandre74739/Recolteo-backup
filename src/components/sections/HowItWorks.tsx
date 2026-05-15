@@ -1,11 +1,13 @@
 import Reveal from "../animations/Reveal";
 import ProfileCard from "../ui/ProfileCard";
 import { profiles } from "../../lib/how-it-works";
+import { HowItWorksDecorations } from "../illustrations/assetsIllustrations";
 
 export default function HowItWorks() {
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-28 overflow-hidden">
+      <HowItWorksDecorations />
+      <div className="relative max-w-7xl mx-auto">
         <div className="mb-12">
           <Reveal delay={0.15}>
             <h2 className="text-sapin font-black mb-4">

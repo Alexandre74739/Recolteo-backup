@@ -17,7 +17,7 @@ export const faqItems: FaqItem[] = [
   {
     question: "Comment est généré le CERFA ?",
     answer:
-      "Dès que le don est confirmé entre les deux parties, Récoltéo génère automatiquement le formulaire CERFA 11580*03. Le document est disponible en téléchargement immédiat depuis le tableau de bord de l'association puis est envoyé au commercant lors de la validation de la collecte.",
+      "Dès que le don est confirmé entre les deux parties, Récoltéo génère automatiquement le formulaire CERFA. Le document est disponible en téléchargement immédiat depuis le tableau de bord de l'association puis est envoyé au commercant lors de la validation de la collecte.",
   },
   {
     question: "Les dons sont-ils limités à l'alimentaire ?",
@@ -27,6 +27,6 @@ export const faqItems: FaqItem[] = [
   {
     question: "Comment contacter le support ?",
     answer:
-      "Pour toute question, vous pouvez nous écrire à digitalbylucie@gmail.com ou via notr formulaire de contact. Nous sommes là pour vous aider !",
+      "Pour toute question, vous pouvez nous écrire à digitalbylucie@gmail.com ou via notre formulaire de contact. Nous sommes là pour vous aider !",
   },
 ];

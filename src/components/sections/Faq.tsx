@@ -4,13 +4,15 @@ import { useState } from "react";
 import Reveal from "../animations/Reveal";
 import FaqItem from "../ui/FaqItem";
 import { faqItems } from "@/src/lib/faq";
+import { FaqDecorations } from "../illustrations/assetsIllustrations";
 
 export default function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-      <div className="max-w-7xl mx-auto">
+    <section id="faq" className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-28 overflow-hidden">
+      <FaqDecorations />
+      <div className="relative max-w-7xl mx-auto">
         <Reveal delay={0.15}>
           <div className="mb-12">
             <h2 className="text-sapin font-black mb-4">

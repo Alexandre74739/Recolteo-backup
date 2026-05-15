@@ -4,13 +4,15 @@ import Button from "../ui/Button";
 import Reveal from "../animations/Reveal";
 import DraggablePill from "../animations/DraggablePill";
 import { categoryRows } from "../../lib/categories";
+import { CategoriesDecorations } from "../illustrations/assetsIllustrations";
 
 const pills = categoryRows.flat();
 
 export default function Categories() {
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-20 sm:py-28 overflow-hidden">
-      <div className="max-w-7xl mx-auto lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+    <section className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-28 overflow-hidden">
+      <CategoriesDecorations />
+      <div className="relative max-w-7xl mx-auto lg:grid lg:grid-cols-2 lg:gap-12 items-center">
         <div className="mb-16 lg:mb-0">
           <Reveal delay={0.12}>
             <h2 className="text-sapin font-black mb-4">
