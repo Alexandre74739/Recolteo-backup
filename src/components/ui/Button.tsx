@@ -28,34 +28,42 @@ export default function Button({
 }: ButtonProps) {
   const variantStyles =
     variant === "sapin"
-      ? "bg-sapin text-cream hover:bg-sapin/90"
+      ? "bg-sapin text-cream hover:bg-sapin/90 border border-sapin shadow-[4px_4px_0_0_#04251c] rounded-2xl"
       : variant === "lime"
-        ? "bg-lime text-sapin hover:bg-lime/80"
+        ? "bg-lime text-sapin hover:bg-lime/80 border border-lime shadow-[4px_4px_0_0_#04251c] rounded-2xl"
         : variant === "peach"
-          ? "bg-peach text-cream hover:bg-peach/90"
+          ? "bg-peach text-cream hover:bg-peach/90 border border-peach shadow-[4px_4px_0_0_#d54a00] rounded-2xl"
           : variant === "sapin-outline"
-            ? "border border-sapin text-sapin hover:bg-sapin hover:text-cream"
+            ? "border border-sapin text-sapin hover:bg-sapin hover:text-cream shadow-[4px_4px_0_0_#06573F]"
             : variant === "lime-outline"
-              ? "border border-lime text-sapin hover:bg-lime"
-              : "border border-peach text-peach hover:bg-peach hover:text-cream";
+              ? "border border-lime text-sapin hover:bg-lime shadow-[4px_4px_0_0_#c9f242]"
+              : "border border-peach text-peach hover:bg-peach hover:text-cream shadow-[4px_4px_0_0_#d54a00]";
 
   const sizeStyles =
     size === "sm"
       ? "px-4 py-2 text-sm rounded-lg gap-2"
       : "px-7 py-3.5 rounded-xl gap-3";
 
+  const className = `group inline-flex items-center font-semibold transition-all active:scale-95 ${sizeStyles} ${variantStyles}`;
+  const arrow = showArrow && (
+    <ArrowRight
+      size={size === "sm" ? 15 : 20}
+      className="transition-transform duration-200 group-hover:translate-x-1"
+    />
+  );
+
+  if (href.startsWith("#"))
+    return (
+      <a href={href} className={className}>
+        {label}
+        {arrow}
+      </a>
+    );
+
   return (
-    <Link
-      href={href}
-      className={`group inline-flex items-center font-semibold transition-all active:scale-95 ${sizeStyles} ${variantStyles}`}
-    >
+    <Link href={href} className={className}>
       {label}
-      {showArrow && (
-        <ArrowRight
-          size={size === "sm" ? 15 : 20}
-          className="transition-transform duration-200 group-hover:translate-x-1"
-        />
-      )}
+      {arrow}
     </Link>
   );
 }

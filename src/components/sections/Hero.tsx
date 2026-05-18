@@ -1,5 +1,6 @@
 import Btn from "../ui/Button";
 import Reveal from "../animations/Reveal";
+import { HeroDecorations } from "../illustrations/assetsIllustrations";
 
 interface HeroProps {
   title: string;
@@ -27,9 +28,12 @@ export default function Hero({
   secondaryButtonHref
 }: HeroProps) {
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-28">
-      <div className="max-w-3xl mx-auto text-center">
-        <Reveal delay={0}>
+    <section className="relative w-full flex flex-col items-center justify-center min-h-[calc(100vh-80px)] px-4 sm:px-6 lg:px-8 py-10 overflow-hidden">
+
+      <HeroDecorations />
+
+      <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <Reveal delay={0.5}>
           <h1 className="text-sapin font-black mb-6">
             {title}
             <br />
@@ -46,11 +50,11 @@ export default function Hero({
           </h1>
         </Reveal>
 
-        <Reveal delay={0.15}>
+        <Reveal delay={0.75}>
           <p className="text-sapin max-w-xl mx-auto mb-10">{description}</p>
         </Reveal>
 
-        <Reveal delay={0.3}>
+        <Reveal delay={1}>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Btn label={primaryButton} href={primaryButtonHref} variant="sapin" />
             <Btn label={secondaryButton} href={secondaryButtonHref} variant="peach" />

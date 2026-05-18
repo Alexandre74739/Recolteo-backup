@@ -39,7 +39,7 @@ export default function ProfileCard({
         <p className="font-bold text-cream leading-snug">{subtitle}</p>
       </div>
 
-      <div className="bg-cream flex flex-col flex-1">
+      <div className="bg-lime/5 flex flex-col flex-1">
         <div className="px-6 pt-6 sm:px-8 flex-1">
           {steps.map((step, i) => (
             <StepItem

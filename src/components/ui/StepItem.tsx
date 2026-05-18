@@ -9,8 +9,8 @@ interface StepItemProps {
 }
 
 export default function StepItem({ icon, title, description, isLast, accent }: StepItemProps) {
-  const bubble = accent === "sapin" ? "bg-sapin/8 text-sapin" : "bg-peach/10 text-peach";
-  const dashed = accent === "sapin" ? "border-sapin/15" : "border-peach/20";
+  const bubble = accent === "sapin" ? "bg-lime text-sapin border border-sapin shadow-[2px_2px_0_0_#06573F]" : "bg-peach text-white border border-[#d54a00] shadow-[2px_2px_0_0_#d54a00]";
+  const dashed = accent === "sapin" ? "border-sapin/25" : "border-peach/30 ";
 
   return (
     <div className="flex gap-4">

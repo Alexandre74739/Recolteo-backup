@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fef9dc;
+  --background: #FAFAFA;
   --foreground: #171717;
 }
 
@@ -14,16 +14,25 @@
 
 @theme {
   --color-sapin: #06573f;
-  --color-cream: #fef9dc;
+  --color-cream: #FAFAFA;
   --color-peach: #f16012;
   --color-lime: #c9f242;
+  --color-beige: #fef9dc;
 
   --animate-loading-bar: loading-bar 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-letter-wave: letter-wave 1.8s ease infinite;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image: linear-gradient(
+    to bottom,
+    rgba(201, 242, 66, 0.22) 0%,
+    rgba(201, 242, 66, 0.08) 50%,
+    rgba(201, 242, 66, 0) 100%
+  );
+  background-size: 100% 100vh;
+  background-repeat: no-repeat;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -95,18 +104,21 @@ body {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(400%);
   }
 }
 
 @keyframes letter-wave {
+
   0%,
   45%,
   100% {
     transform: translateY(0) scale(1);
     color: var(--color-sapin);
   }
+
   22% {
     transform: translateY(-26px) scale(1.08);
     color: var(--color-lime);
@@ -118,6 +130,7 @@ body {
     opacity: 0;
     transform: translateY(22px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -127,21 +140,27 @@ body {
 .animate-in {
   animation: fadeSlideUp 0.55s ease-out both;
 }
+
 .delay-1 {
   animation-delay: 120ms;
 }
+
 .delay-2 {
   animation-delay: 240ms;
 }
+
 .delay-3 {
   animation-delay: 360ms;
 }
+
 .delay-4 {
   animation-delay: 480ms;
 }
+
 .delay-5 {
   animation-delay: 600ms;
 }
+
 .delay-6 {
   animation-delay: 720ms;
 }
@@ -150,6 +169,7 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scroll-hide::-webkit-scrollbar {
   display: none;
 }
