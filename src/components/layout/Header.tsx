@@ -21,11 +21,6 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
-function getInitials(nom: string): string {
-  const [prenom, famille] = nom.trim().split(/\s+/);
-  return (prenom[0] + famille[0]).toUpperCase();
-}
-
 function CartButton() {
   return (
     <button className="relative p-2 rounded-xl text-sapin hover:bg-sapin/10 transition-all">
@@ -75,7 +70,7 @@ export default function Header({ user }: HeaderProps) {
                 className="hidden md:flex w-9 h-9 rounded-xl bg-sapin text-cream font-black text-sm items-center justify-center hover:bg-sapin/80 transition-all shadow-[3px_3px_0_0_#04251c]"
                 aria-label="Mon compte"
               >
-                {getInitials(user.nom)}
+                {user.nom[0].toUpperCase()}
               </Link>
             ) : (
               <div className="hidden md:block">
@@ -119,7 +114,7 @@ export default function Header({ user }: HeaderProps) {
                   className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sapin font-bold hover:bg-sapin/10 transition-all duration-150"
                 >
                   <span className="w-7 h-7 rounded-lg bg-sapin text-cream font-black text-xs flex items-center justify-center shrink-0">
-                    {getInitials(user.nom)}
+                    {user.nom[0].toUpperCase()}
                   </span>
                   <span className="text-sm truncate">{user.nom}</span>
                 </Link>
