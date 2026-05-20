@@ -20,8 +20,7 @@ const navLinks = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Contact", href: "/contact" },
 ];
- 
- 
+
 function CartButton() {
   return (
     <button className="relative p-2 rounded-xl text-sapin hover:bg-sapin/10 transition-all">
