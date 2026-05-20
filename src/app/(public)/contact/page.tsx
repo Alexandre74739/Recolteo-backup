@@ -9,7 +9,7 @@ export default function Contact() {
         subtitle="à votre"
         labelTitle="disposition"
         spanTitle="pour"
-        endTitle="toute questions"
+        endTitle="toute question"
         description="Contactez-nous via le formulaire ci-dessous, nous vous répondrons rapidement."
         primaryButton="Explorer la plateforme"
         primaryButtonHref="./decouvrir-recolteo"
