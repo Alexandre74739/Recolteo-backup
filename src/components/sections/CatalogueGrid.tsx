@@ -7,7 +7,13 @@ import Pagination from "../ui/primitives/Pagination";
 
 const PAGE_SIZE = 20;
 
-export default function CatalogueGrid({ lots }: { lots: Lot[] }) {
+export default function CatalogueGrid({
+  lots,
+  showCartButton,
+}: {
+  lots: Lot[];
+  showCartButton?: boolean;
+}) {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(lots.length / PAGE_SIZE);
   const pageLots = lots.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -32,7 +38,7 @@ export default function CatalogueGrid({ lots }: { lots: Lot[] }) {
             viewport={{ once: true, amount: 0.15 }}
             transition={{ delay: i * 0.1, ease: "easeOut", duration: 0.4 }}
           >
-            <LotCard lot={lot} />
+            <LotCard lot={lot} showCartButton={showCartButton} />
           </motion.div>
         ))}
       </div>

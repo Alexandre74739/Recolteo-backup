@@ -1,20 +1,14 @@
+"use client";
+
+import { useState } from "react";
+import { supprimerLot } from "@/src/app/(main)/lots/actions";
+import ConfirmDeleteModal from "@/src/components/ui/modals/ConfirmDeleteModal";
 import Button from "@/src/components/ui/primitives/Button";
+import type { Lot } from "./LotCard";
 
-export interface Lot {
-  id_lot: number;
-  name_entreprise: string;
-  adresse: string;
-  adresse_recup: string;
-  category: string;
-  nature: string;
-  quantity: number;
-  dlc: string | null;
-  montant_chiffre: number;
-  montant_lettre: string;
-  created_at: string;
-}
+export default function LotCardGestion({ lot }: { lot: Lot }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-export default function LotCard({ lot, showCartButton }: { lot: Lot; showCartButton?: boolean }) {
   const dlc = lot.dlc
     ? new Date(lot.dlc).toLocaleDateString("fr-FR", {
         day: "2-digit",
@@ -24,7 +18,7 @@ export default function LotCard({ lot, showCartButton }: { lot: Lot; showCartBut
     : null;
 
   return (
-    <article className="relative bg-white border-2 border-sapin/10 rounded-2xl overflow-hidden shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)] flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_8px_0_0_color-mix(in_srgb,var(--color-sapin)_12%,transparent)] hover:border-sapin/20 cursor-pointer">
+    <article className="relative bg-white border-2 border-sapin/10 rounded-2xl overflow-hidden shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)] flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_8px_0_0_color-mix(in_srgb,var(--color-sapin)_12%,transparent)] hover:border-sapin/20">
       <div className="h-1.5 w-full bg-lime" />
 
       <div className="p-4 lg:p-5 flex flex-col gap-3 lg:gap-4 flex-1">
@@ -43,18 +37,24 @@ export default function LotCard({ lot, showCartButton }: { lot: Lot; showCartBut
                 currency: "EUR",
               })}
             </span>
-            <span className="block text-[9px] text-sapin/40 font-medium mt-0.5">{lot.montant_lettre}</span>
+            <span className="block text-[9px] text-sapin/40 font-medium mt-0.5">
+              {lot.montant_lettre}
+            </span>
           </div>
         </div>
 
-        <p className="text-xs lg:text-sm text-sapin/70 leading-relaxed">{lot.nature}</p>
+        <p className="text-xs lg:text-sm text-sapin/70 leading-relaxed">
+          {lot.nature}
+        </p>
 
-        <div className="grid grid-cols-2 gap-2 mt-auto">
+        <div className="grid grid-cols-2 gap-2">
           <div className="bg-sapin/4 border border-sapin/6 rounded-xl px-3 py-2.5">
             <span className="block text-[10px] font-bold text-sapin/40 uppercase tracking-widest mb-0.5">
               Volume
             </span>
-            <span className="block text-sm font-semibold text-sapin">{lot.quantity} kg</span>
+            <span className="block text-sm font-semibold text-sapin">
+              {lot.quantity} kg
+            </span>
           </div>
 
           {dlc ? (
@@ -62,29 +62,49 @@ export default function LotCard({ lot, showCartButton }: { lot: Lot; showCartBut
               <span className="block text-[10px] font-bold text-peach/60 uppercase tracking-widest mb-0.5">
                 DLC
               </span>
-              <span className="block text-sm font-semibold text-peach whitespace-nowrap">{dlc}</span>
+              <span className="block text-sm font-semibold text-peach whitespace-nowrap">
+                {dlc}
+              </span>
             </div>
           ) : (
             <div className="bg-sapin/4 border border-sapin/6 rounded-xl px-3 py-2.5">
               <span className="block text-[10px] font-bold text-sapin/40 uppercase tracking-widest mb-0.5">
                 Récup.
               </span>
-              <span className="block text-sm font-semibold text-sapin truncate">{lot.adresse_recup}</span>
+              <span className="block text-sm font-semibold text-sapin truncate">
+                {lot.adresse_recup}
+              </span>
             </div>
           )}
         </div>
 
-        {showCartButton && (
+        <div className="flex gap-2 mt-auto pt-1">
           <Button
-            type="button"
-            label="Ajouter au panier"
-            variant="sapin"
+            label="Modifier"
+            href={`/lots/${lot.id_lot}/modifier`}
+            variant="sapin-outline"
             size="sm"
             showArrow={false}
-            className="mt-1 w-full justify-center"
+            className="flex-1 justify-center"
           />
-        )}
+          <Button
+            label="Supprimer"
+            onClick={() => setShowDeleteModal(true)}
+            variant="peach-outline"
+            size="sm"
+            showArrow={false}
+            className="flex-1 justify-center"
+          />
+        </div>
       </div>
+
+      {showDeleteModal && (
+        <ConfirmDeleteModal
+          lotName={lot.name_entreprise}
+          onConfirm={() => supprimerLot(lot.id_lot)}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
     </article>
   );
 }
