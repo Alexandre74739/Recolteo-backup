@@ -6,7 +6,13 @@ import { type Lot } from "../ui/cards/LotCard";
 
 export type { Lot };
 
-export default function CatalogueLots({ lots }: { lots: Lot[] }) {
+export default function CatalogueLots({
+  lots,
+  showCartButton,
+}: {
+  lots: Lot[];
+  showCartButton?: boolean;
+}) {
   return (
     <section
       id="lots"
@@ -20,7 +26,7 @@ export default function CatalogueLots({ lots }: { lots: Lot[] }) {
         {lots.length === 0 ? (
           <CatalogueEmptyState />
         ) : (
-          <CatalogueGrid lots={lots} />
+          <CatalogueGrid lots={lots} showCartButton={showCartButton} />
         )}
       </div>
     </section>

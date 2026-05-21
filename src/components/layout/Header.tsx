@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ShoppingCart } from "@deemlol/next-icons";
+import { Menu, X, Repeat } from "@deemlol/next-icons";
 import Btn from "../ui/primitives/Button";
-import Panier from "@/src/app/(main)/panier/page";
 
 type UserInfo = {
   nom: string;
@@ -25,7 +24,7 @@ const navLinks = [
 function CartButton() {
   return (
     <button className="relative p-2 rounded-xl text-sapin hover:bg-sapin/10 transition-all">
-      <ShoppingCart size={20} />
+      <Repeat size={20} />
       <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-peach text-cream text-[9px] font-bold flex items-center justify-center leading-none">
         0
       </span>
@@ -63,9 +62,8 @@ export default function Header({ user }: HeaderProps) {
           </nav>
 
           <div className="flex items-center gap-2 shrink-0">
-            {user && (
-              <Link
-                href="/panier"              >
+            {user?.role === "association" && (
+              <Link href="/panier">
                 <CartButton />
               </Link>
             )}

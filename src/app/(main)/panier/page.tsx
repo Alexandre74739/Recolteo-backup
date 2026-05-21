@@ -1,8 +1,9 @@
-import Reveal from "@/src/components/animations/Reveal";
+import { Repeat } from "@deemlol/next-icons";
 import Btn from "@/src/components/ui/primitives/Button";
+import CatalogueDecorations from "@/src/components/illustrations/CatalogueDecorations";
+import Reveal from "@/src/components/animations/Reveal";
 
-export default function Panier() {
-  const selectedProducts = [] as {
+type PanierItem = {
   id: number;
   title: string;
   vendor: string;
@@ -10,116 +11,171 @@ export default function Panier() {
   pickup: string;
   price: number;
   category: string;
-}[];
+};
 
-  const totalPrice = selectedProducts.reduce((sum, item) => sum + item.price, 0);
+const selectedProducts: PanierItem[] = [];
 
+const totalPrice = selectedProducts.reduce((sum, item) => sum + item.price, 0);
+
+export default function Panier() {
   if (selectedProducts.length === 0) {
     return (
-      <Reveal>
-        <div className="min-h-screen flex flex-col gap-3 px-4 text-sapin">
-          <h2>Mon panier</h2>
-          <p className="text-center">Votre panier est vide.</p>
-          <div className="mt-2 justify-center flex">
-            <Btn
-              label="Continuer mes achats"
-              href="/lots"
-              variant="sapin"
-              size="md"
-              showArrow={true}
-            />
-          </div>
-        </div>
-      </Reveal>
+      <main>
+        <section className="relative min-h-[calc(100vh-80px)] flex items-center justify-center px-4 overflow-hidden">
+          <CatalogueDecorations />
+          <Reveal>
+            <div className="relative z-10 text-center max-w-sm mx-auto">
+              <div className="w-20 h-20 rounded-3xl bg-lime border border-sapin shadow-[4px_4px_0_0_#06573F] flex items-center justify-center mx-auto mb-8">
+                <Repeat size={32} className="text-sapin" />
+              </div>
+              <h1 className="text-sapin font-black text-3xl mb-3">
+                Panier vide
+              </h1>
+              <p className="text-sapin/60 mb-8 leading-relaxed">
+                Vous n'avez encore rien sélectionné. Parcourez les lots
+                disponibles et ajoutez ceux dont votre association a besoin.
+              </p>
+              <Btn
+                label="Explorer les lots"
+                href="/lots"
+                variant="sapin"
+                className="justify-center"
+              />
+            </div>
+          </Reveal>
+        </section>
+      </main>
     );
   }
 
   return (
-    <Reveal>
-      <div className="min-h-screen flex flex-col gap-6 px-4 py-6 text-sapin">
-        <div className="flex flex-col gap-3">
-          <h2 className="text-start text-3xl font-black">Mon panier</h2>
-          <p className="text-sapin/70">Vérifiez vos produits sélectionnés et finalisez votre commande.</p>
-        </div>
+    <main>
+      <section className="relative overflow-hidden px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+        <CatalogueDecorations />
 
-        <div className="flex flex-row w-full gap-6">
-          <div className="w-[70%] rounded-[2rem] border border-sapin/10 bg-white/80 p-6 shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)]">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-bold">Éléments sélectionnés</h3>
-              <span className="text-sm text-sapin/60">{selectedProducts.length} articles</span>
-            </div>
-
-            <div className="space-y-4">
-              {selectedProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="rounded-3xl border border-sapin/10 bg-sapin/5 p-5 shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)]"
-                >
-                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="min-w-0">
-                      <span className="inline-flex rounded-full bg-lime/20 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-sapin">
-                        {product.category}
-                      </span>
-                      <h4 className="mt-3 text-lg font-black text-sapin truncate">{product.title}</h4>
-                      <p className="mt-1 text-sm text-sapin/70">{product.vendor}</p>
-                    </div>
-                    <div className="flex items-center gap-4 text-right">
-                      <div>
-                        <p className="text-sm text-sapin/70">Quantité</p>
-                        <p className="text-base font-semibold text-sapin">{product.quantity} kg</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-sapin/70">Prix</p>
-                        <p className="text-base font-black text-peach">
-                          {product.price.toLocaleString("fr-FR", {
-                            style: "currency",
-                            currency: "EUR",
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="mt-4 text-sm text-sapin/60">Point de récupération : {product.pickup}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <aside className="w-[30%] rounded-[2rem] border border-sapin/10 bg-sapin/5 p-6 shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)]">
-            <div className="mb-6">
-              <h3 className="text-xl font-bold">Récapitulatif</h3>
-              <p className="mt-2 text-sm text-sapin/70">Vérifiez le montant total et passez à la validation.</p>
-            </div>
-
-            <div className="space-y-4 rounded-3xl bg-white p-5 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.03)]">
-              <div className="flex justify-between text-sapin/70">
-                <span>Articles</span>
-                <span>{selectedProducts.length}</span>
-              </div>
-              <div className="flex justify-between text-sapin/70">
-                <span>Frais de service</span>
-                <span>Gratuit</span>
-              </div>
-              <div className="border-t border-sapin/10 pt-4 flex justify-between text-base font-bold text-sapin">
-                <span>Total</span>
-                <span>
-                  {totalPrice.toLocaleString("fr-FR", {
-                    style: "currency",
-                    currency: "EUR",
-                  })}
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <Reveal delay={0.1}>
+            <div className="mb-12">
+              <h1 className="text-sapin font-black mb-2">
+                Mon{" "}
+                <span className="relative italic whitespace-nowrap">
+                  <span
+                    className="absolute inset-0 bg-lime rounded-xl -rotate-1 scale-x-110"
+                    aria-hidden="true"
+                  />
+                  <span className="relative">panier</span>
                 </span>
-              </div>
-            </div>
-
-            <div className="mt-8 space-y-4">
-              <Btn label="Payer" href="#" variant="sapin" size="md" />
-              <p className="text-sm text-sapin/70">
-                Le paiement se fera dans l’interface sécurisée après validation de la commande.
+              </h1>
+              <p className="text-sapin/70">
+                Vérifiez vos lots sélectionnés avant de finaliser votre demande.
               </p>
             </div>
-          </aside>
+          </Reveal>
+
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 min-w-0">
+              <Reveal delay={0.2}>
+                <div className="bg-white border-2 border-sapin/10 rounded-2xl shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)] overflow-hidden">
+                  <div className="px-6 py-4 border-b border-sapin/8 flex items-center justify-between">
+                    <h2 className="font-bold text-sapin">Lots sélectionnés</h2>
+                    <span className="text-xs font-semibold text-sapin/40 uppercase tracking-widest">
+                      {selectedProducts.length} lot
+                      {selectedProducts.length > 1 ? "s" : ""}
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-sapin/6">
+                    {selectedProducts.map((product) => (
+                      <div
+                        key={product.id}
+                        className="p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-lime/30 text-sapin border border-lime/50 leading-tight mb-2">
+                            {product.category}
+                          </span>
+                          <h3 className="font-black text-sapin text-sm lg:text-base truncate">
+                            {product.title}
+                          </h3>
+                          <p className="text-xs text-sapin/50 mt-0.5">
+                            {product.vendor}
+                          </p>
+                          <p className="text-xs text-sapin/40 mt-2">
+                            Récupération : {product.pickup}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-6 shrink-0">
+                          <div className="text-right">
+                            <span className="block text-[10px] font-bold text-sapin/40 uppercase tracking-widest mb-0.5">
+                              Volume
+                            </span>
+                            <span className="block text-sm font-semibold text-sapin">
+                              {product.quantity} kg
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="block text-[10px] font-bold text-sapin/40 uppercase tracking-widest mb-0.5">
+                              Valeur
+                            </span>
+                            <span className="block text-sm font-black text-peach whitespace-nowrap">
+                              {product.price.toLocaleString("fr-FR", {
+                                style: "currency",
+                                currency: "EUR",
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+            </div>
+
+            <aside className="lg:w-72 shrink-0">
+              <Reveal delay={0.3}>
+                <div className="bg-white border-2 border-sapin/10 rounded-2xl shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)] p-6 sticky top-20">
+                  <h2 className="font-bold text-sapin mb-4">Récapitulatif</h2>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-sapin/60">Lots</span>
+                      <span className="font-semibold text-sapin">
+                        {selectedProducts.length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-sapin/60">Frais de service</span>
+                      <span className="font-semibold text-sapin">Gratuit</span>
+                    </div>
+                    <div className="h-px bg-sapin/8" />
+                    <div className="flex justify-between">
+                      <span className="font-bold text-sapin">Total estimé</span>
+                      <span className="font-black text-peach">
+                        {totalPrice.toLocaleString("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Btn
+                    label="Valider ma demande"
+                    href="#"
+                    variant="sapin"
+                    className="w-full justify-center"
+                  />
+                  <p className="text-xs text-sapin/40 mt-3 text-center leading-relaxed">
+                    La validation envoie une demande au commerçant concerné.
+                  </p>
+                </div>
+              </Reveal>
+            </aside>
+          </div>
         </div>
-      </div>
-    </Reveal>
+      </section>
+    </main>
   );
 }

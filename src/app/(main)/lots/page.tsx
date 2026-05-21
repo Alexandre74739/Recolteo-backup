@@ -5,6 +5,7 @@ import Hero from "@/src/components/sections/Hero";
 import CatalogueLots, {
   type Lot,
 } from "@/src/components/sections/CatalogueLots";
+import GestionLots from "@/src/components/sections/GestionLots";
 
 export const metadata: Metadata = {
   title: "Lots — Récoltéo",
@@ -22,30 +23,35 @@ export default async function LotPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: userRow } = await supabase
+    .from("user")
+    .select("id_user")
+    .eq("auth_id", user.id)
+    .maybeSingle();
+
   const [adminResult, commercantResult] = await Promise.all([
     supabase.from("administrateur").select("id_admin").maybeSingle(),
-    supabase
-      .from("commercant")
-      .select("id_commercant")
-      .eq("is_validated", true)
-      .maybeSingle(),
+    userRow
+      ? supabase
+          .from("commercant")
+          .select("id_commercant")
+          .eq("id_user", userRow.id_user)
+          .eq("is_validated", true)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
   ]);
 
-  const isCommercantOrAdmin = !!adminResult.data || !!commercantResult.data;
+  const isAdmin = !!adminResult.data;
+  const isCommercant = !!commercantResult.data;
 
-  const lotsQuery = supabase
-    .from("lot")
-    .select(LOT_FIELDS)
-    .eq("statut", true)
-    .order("created_at", { ascending: false });
+  if (isCommercant && !isAdmin) {
+    const { data: lotsData } = await supabase
+      .from("lot")
+      .select(LOT_FIELDS)
+      .eq("statut", true)
+      .eq("id_commercant", commercantResult.data!.id_commercant)
+      .order("created_at", { ascending: false });
 
-  const { data: lotsData } = commercantResult.data
-    ? await lotsQuery.eq("id_commercant", commercantResult.data.id_commercant)
-    : await lotsQuery;
-
-  const lots = (lotsData ?? []) as Lot[];
-
-  if (isCommercantOrAdmin) {
     return (
       <main>
         <Hero
@@ -57,10 +63,38 @@ export default async function LotPage() {
           description="Déclarez vos invendus et mettez-les à disposition des associations partenaires en quelques clics."
           primaryButton="Déclarer un lot"
           primaryButtonHref="/lots/declarer-lot"
+          secondaryButton="Mon profil"
+          secondaryButtonHref="/profil"
+        />
+        <GestionLots lots={(lotsData ?? []) as Lot[]} />
+      </main>
+    );
+  }
+
+  const { data: lotsData } = await supabase
+    .from("lot")
+    .select(LOT_FIELDS)
+    .eq("statut", true)
+    .order("created_at", { ascending: false });
+
+  const lots = (lotsData ?? []) as Lot[];
+
+  if (isAdmin) {
+    return (
+      <main>
+        <Hero
+          title=""
+          subtitle="Gérez"
+          labelTitle="tous les lots"
+          spanTitle="facilement"
+          endTitle="sur Récoltéo"
+          description="Vue complète de tous les lots actifs de la plateforme. Déclarez, modifiez ou supprimez n'importe quel lot."
+          primaryButton="Déclarer un lot"
+          primaryButtonHref="/lots/declarer-lot"
           secondaryButton="Contactez-nous"
           secondaryButtonHref="/contact"
         />
-        <CatalogueLots lots={lots} />
+        <GestionLots lots={lots} adminView />
       </main>
     );
   }
@@ -79,7 +113,7 @@ export default async function LotPage() {
         secondaryButton="En savoir plus"
         secondaryButtonHref="/decouvrir-recolteo"
       />
-      <CatalogueLots lots={lots} />
+      <CatalogueLots lots={lots} showCartButton />
     </main>
   );
 }
