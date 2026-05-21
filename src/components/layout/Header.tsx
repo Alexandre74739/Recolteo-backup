@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, ShoppingCart } from "@deemlol/next-icons";
 import Btn from "../ui/primitives/Button";
+import Panier from "@/src/app/(main)/panier/page";
 
 type UserInfo = {
   nom: string;
@@ -62,7 +63,12 @@ export default function Header({ user }: HeaderProps) {
           </nav>
 
           <div className="flex items-center gap-2 shrink-0">
-            {user && <CartButton />}
+            {user && (
+              <Link
+                href="/panier"              >
+                <CartButton />
+              </Link>
+            )}
 
             {user ? (
               <Link
