@@ -62,8 +62,8 @@ export default function RadiusSlider({ value, onChange, withOff, disabled }: Rad
         {steps.map((step, i) => (
           <span
             key={i}
-            className={`text-[10px] font-medium leading-none ${
-              value === i ? "text-sapin font-bold" : "text-sapin/40"
+            className={`text-sm font-bold leading-none ${
+              value === i ? "text-sapin" : "text-sapin/40"
             }`}
           >
             {step === "off" ? "—" : step}

@@ -9,6 +9,8 @@ import {
 import RadiusSlider, {
   RADIUS_STEPS,
 } from "@/src/components/ui/primitives/RadiusSlider";
+import StepSlider from "@/src/components/ui/primitives/StepSlider";
+import FilterPart from "@/src/components/ui/parts/FilterPart";
 import CatalogueGrid from "@/src/components/sections/CatalogueGrid";
 import type { Lot } from "@/src/components/ui/cards/LotCard";
 
@@ -34,8 +36,8 @@ function haversineKm(
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -89,7 +91,6 @@ export default function CatalogueLotsFilter({
 
   const dateFilter = DATE_FILTER_MAP[dateIndex];
   const isDateFiltered = dateIndex > 0;
-  const datePercent = (dateIndex / (DATE_STEPS.length - 1)) * 100;
 
   const filtered = lots.filter((lot) => {
     if (dateFilter === "today" && !isWithinDays(lot.created_at, 1))
@@ -131,110 +132,33 @@ export default function CatalogueLotsFilter({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-start gap-3">
-              <div
-                className={`w-10 h-10 border rounded-xl shadow-[2px_2px_0_0_#06573F] flex items-center justify-center shrink-0 transition-colors ${
-                  applyRadius
-                    ? "bg-lime border-sapin text-sapin"
-                    : "bg-lime/40 border-sapin/40 text-sapin/50"
-                }`}
-              >
-                <MapPin size={18} />
-              </div>
-              <div>
-                <p className="font-semibold text-sapin leading-tight">
-                  {radiusTitle}
-                </p>
-                <p className="text-sapin/60 text-sm leading-snug mt-0.5">
-                  {radiusDescription}
-                </p>
-              </div>
-            </div>
-
+          <FilterPart
+            icon={<MapPin size={20} />}
+            title={radiusTitle}
+            subtitle={radiusDescription}
+            isActive={applyRadius}
+          >
             <RadiusSlider
               value={radiusIndex}
               onChange={setRadiusIndex}
               withOff
               disabled={!canUseRadius}
             />
-          </div>
+          </FilterPart>
 
-          <div className="flex flex-col gap-4">
-            <div className="flex items-start gap-3">
-              <div
-                className={`w-10 h-10 border rounded-xl shadow-[2px_2px_0_0_#06573F] flex items-center justify-center shrink-0 transition-colors ${
-                  isDateFiltered
-                    ? "bg-lime border-sapin text-sapin"
-                    : "bg-lime/40 border-sapin/40 text-sapin/50"
-                }`}
-              >
-                <Calendar size={18} />
-              </div>
-              <div>
-                <p className="font-semibold text-sapin leading-tight">
-                  {dateTitle}
-                </p>
-                <p className="text-sapin/60 text-sm leading-snug mt-0.5">
-                  {dateDescription}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2 w-full">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-sapin">
-                  Période de parution
-                </span>
-                <span
-                  className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
-                    isDateFiltered
-                      ? "text-sapin bg-lime/50 border-lime"
-                      : "text-sapin/50 bg-sapin/8 border-sapin/20"
-                  }`}
-                >
-                  {DATE_STEPS[dateIndex]}
-                </span>
-              </div>
-
-              <div className="relative h-10 flex items-center select-none">
-                <div className="absolute w-full h-1.5 bg-sapin/10 rounded-full" />
-                <div
-                  className={`absolute h-1.5 rounded-full transition-all duration-150 ${isDateFiltered ? "bg-sapin" : "bg-sapin/20"}`}
-                  style={{ width: `${datePercent}%` }}
-                />
-                <div
-                  className={`absolute w-5 h-5 rounded-full border-2 border-cream shadow-md -translate-x-1/2 transition-all duration-150 pointer-events-none ${
-                    isDateFiltered ? "bg-sapin" : "bg-sapin/30"
-                  }`}
-                  style={{ left: `${datePercent}%` }}
-                />
-                <input
-                  type="range"
-                  min={0}
-                  max={DATE_STEPS.length - 1}
-                  step={1}
-                  value={dateIndex}
-                  onChange={(e) => setDateIndex(Number(e.target.value))}
-                  className="absolute w-full h-10 opacity-0 cursor-pointer"
-                  aria-label={`Période : ${DATE_STEPS[dateIndex]}`}
-                />
-              </div>
-
-              <div className="flex justify-between">
-                {DATE_STEPS.map((step, i) => (
-                  <span
-                    key={i}
-                    className={`text-[10px] font-medium leading-none transition-colors ${
-                      dateIndex === i ? "text-sapin font-bold" : "text-sapin/40"
-                    }`}
-                  >
-                    {step}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+          <FilterPart
+            icon={<Calendar size={20} />}
+            title={dateTitle}
+            subtitle={dateDescription}
+            isActive={isDateFiltered}
+          >
+            <StepSlider
+              steps={DATE_STEPS}
+              value={dateIndex}
+              onChange={setDateIndex}
+              label="Période de parution"
+            />
+          </FilterPart>
         </div>
       </div>
 

@@ -63,7 +63,7 @@ export default function CatalogueLots({
                 <span className="relative">{sectionHighlight}</span>
               </span>
             </h2>
-            <p className="text-sapin/70 max-w-2xl">{description}</p>
+            <p className="text-sapin max-w-2xl">{description}</p>
           </div>
         </Reveal>
 

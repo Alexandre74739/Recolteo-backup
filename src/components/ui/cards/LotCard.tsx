@@ -38,9 +38,7 @@ export default function LotCard({
     : null;
 
   return (
-    <article className="relative bg-white border-2 border-sapin/10 rounded-2xl overflow-hidden shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)] flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_8px_0_0_color-mix(in_srgb,var(--color-sapin)_12%,transparent)] hover:border-sapin/20 cursor-pointer">
-      <div className="h-1.5 w-full bg-lime" />
-
+    <article className="relative bg-lime/5 border-2 border-sapin/10 rounded-2xl overflow-hidden shadow-[4px_4px_0_0_color-mix(in_srgb,var(--color-sapin)_8%,transparent)] flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#06573F] hover:border-[#06573F] cursor-pointer">
       <div className="p-4 lg:p-5 flex flex-col gap-3 lg:gap-4 flex-1">
         <span className="inline-flex w-fit items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-lime/30 text-sapin border border-lime/50 leading-tight">
           {lot.category}

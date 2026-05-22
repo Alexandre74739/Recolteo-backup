@@ -28,11 +28,11 @@ export default async function LotPage() {
     supabase.from("administrateur").select("id_admin").maybeSingle(),
     userRow
       ? supabase
-          .from("commercant")
-          .select("id_commercant")
-          .eq("id_user", userRow.id_user)
-          .eq("is_validated", true)
-          .maybeSingle()
+        .from("commercant")
+        .select("id_commercant")
+        .eq("id_user", userRow.id_user)
+        .eq("is_validated", true)
+        .maybeSingle()
       : Promise.resolve({ data: null, error: null }),
   ]);
 
@@ -130,27 +130,27 @@ export default async function LotPage() {
         description="Parcourez les lots mis à disposition par nos commerçants partenaires et réservez ceux dont votre association a besoin."
         primaryButton="Voir les lots disponibles"
         primaryButtonHref="#lots"
-        secondaryButton="En savoir plus"
-        secondaryButtonHref="/decouvrir-recolteo"
+        secondaryButton="Contactez-nous"
+        secondaryButtonHref="/contact"
       />
       <CatalogueLots
-          lots={lots}
-          showCartButton
-          assoCoords={assoCoords}
-          sectionTitle="Lots"
-          sectionHighlight="disponibles"
-          description="Découvrez les invendus et ressources mis à disposition par nos commerçants partenaires. Chaque lot est une opportunité de lutter contre le gaspillage et de soutenir votre activité associative."
-          emptyTitle="Aucun lot disponible pour le moment"
-          emptySubtitle="Revenez prochainement, de nouveaux lots sont ajoutés régulièrement."
-          filterTitle="Affinez votre recherche"
-          filterDescription="Deux filtres sont à votre disposition : filtrez par proximité géographique autour de votre association, ou par date de publication pour voir les lots les plus récents en premier."
-          filterRadiusTitle="Par proximité"
-          filterRadiusDescription="Filtrez les lots selon la distance autour de vous."
-          filterDateTitle="Par date de parution"
-          filterDateDescription="Affichez les lots publiés sur une période précise."
-          filterEmptyTitle="Aucun lot ne correspond à vos filtres"
-          filterEmptySubtitle="Essayez d'élargir le rayon ou de changer la période."
-        />
+        lots={lots}
+        showCartButton
+        assoCoords={assoCoords}
+        sectionTitle="Lots"
+        sectionHighlight="disponibles"
+        description="Découvrez les invendus et ressources mis à disposition par nos commerçants partenaires. Chaque lot est une opportunité de lutter contre le gaspillage et de soutenir votre activité associative."
+        emptyTitle="Aucun lot disponible pour le moment"
+        emptySubtitle="Revenez prochainement, de nouveaux lots sont ajoutés régulièrement."
+        filterTitle="Affinez votre recherche"
+        filterDescription="Deux filtres sont à votre disposition : filtrez par proximité géographique autour de votre association, ou par date de publication pour voir les lots les plus récents en premier."
+        filterRadiusTitle="Par proximité"
+        filterRadiusDescription="Filtrez les lots selon la distance autour de vous."
+        filterDateTitle="Par date de parution"
+        filterDateDescription="Affichez les lots publiés sur une période précise."
+        filterEmptyTitle="Aucun lot ne correspond à vos filtres"
+        filterEmptySubtitle="Essayez d'élargir le rayon ou de changer la période."
+      />
     </main>
   );
 }
