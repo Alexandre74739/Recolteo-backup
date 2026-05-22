@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
 import Hero from "@/src/components/sections/Hero";
@@ -6,12 +5,6 @@ import CatalogueLots, {
   type Lot,
 } from "@/src/components/sections/CatalogueLots";
 import GestionLots from "@/src/components/sections/GestionLots";
-
-export const metadata: Metadata = {
-  title: "Lots — Récoltéo",
-  description:
-    "Gérez vos lots d'invendus ou parcourez les ressources disponibles près de chez vous sur Récoltéo, la plateforme solidaire qui connecte commerçants et associations.",
-};
 
 const LOT_FIELDS =
   "id_lot, name_entreprise, adresse, adresse_recup, instructions, category, nature, quantity, dlc, montant_chiffre, montant_lettre, created_at";

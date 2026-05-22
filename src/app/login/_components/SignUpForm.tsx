@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useActionState, useEffect, useRef, useState } from "react";
+import { Fragment, startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { signUp, type ActionState } from "../actions";
 import Input from "@/src/components/ui/primitives/Input";
 import Button from "@/src/components/ui/primitives/Button";
@@ -152,7 +152,7 @@ export default function SignUpForm() {
     setLocalError(undefined);
     fd.append("password", s1.password);
     fd.append("confirmPassword", s1.confirmPassword);
-    action(fd);
+    startTransition(() => action(fd));
   }
 
   const isAsso = s1.role === "association";

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Clock, UserX, Shield } from "@deemlol/next-icons";
+import EmptyState from "@/src/components/ui/primitives/EmptyState";
 import { signOut } from "@/src/app/login/actions";
 import Button from "@/src/components/ui/primitives/Button";
 import TabToggle from "@/src/components/ui/primitives/TabToggle";
@@ -68,18 +69,11 @@ export default function ProfilLayout({
             {tab === "info" && <InfoTab entityInfo={entityInfo} />}
             {tab === "docs" && <DocsTab role={role} authId={authId} />}
             {tab === "historique" && (
-              <div className="flex flex-col items-center gap-4 py-14 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-sapin/5 border border-dashed border-sapin/20 flex items-center justify-center">
-                  <Clock size={26} className="text-sapin/30" />
-                </div>
-                <div>
-                  <p className="font-bold text-sapin/60">Bientôt disponible</p>
-                  <p className="text-sapin/40 mt-1 max-w-xs">
-                    L'historique de vos activités sera disponible dans une
-                    prochaine version.
-                  </p>
-                </div>
-              </div>
+              <EmptyState
+                icon={<Clock size={32} className="text-sapin/30" />}
+                title="Bientôt disponible"
+                description="L'historique de vos activités sera disponible dans une prochaine version."
+              />
             )}
           </div>
         </div>
