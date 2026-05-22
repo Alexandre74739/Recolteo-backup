@@ -18,7 +18,6 @@ export interface Association {
   email: string;
   tel: string;
   type_asso: string;
-  rayon_action: number;
   adresse: string;
   rna: string;
   created_at: string;

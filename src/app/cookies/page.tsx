@@ -116,6 +116,39 @@ export default function CookiesPage() {
                 Aucun cookie fonctionnel n'est déposé sans votre accord préalable.
               </p>
             </div>
+
+            <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40">
+              <h3 className="font-bold text-sapin mb-2">Cookies de géolocalisation</h3>
+              <p className="text-sm text-sapin/70 mb-3">
+                Ces cookies, déposés uniquement avec votre consentement, mémorisent votre
+                autorisation d'utiliser votre adresse postale à des fins de filtrage géographique
+                des lots disponibles. Lorsque vous activez cette option, votre adresse est transmise
+                à l'<strong>API de la Base Adresse Nationale</strong> (api-adresse.data.gouv.fr),
+                un service officiel du gouvernement français, afin d'obtenir ses coordonnées
+                géographiques. Ces coordonnées sont stockées dans notre base de données et ne sont
+                jamais transmises à des tiers. Aucune donnée de position GPS de votre appareil
+                n'est collectée.
+              </p>
+              <table className="w-full text-xs text-sapin/70 border-collapse">
+                <thead>
+                  <tr className="border-b border-sapin/10">
+                    <th className="text-left py-1 pr-4 font-semibold">Nom</th>
+                    <th className="text-left py-1 pr-4 font-semibold">Finalité</th>
+                    <th className="text-left py-1 font-semibold">Durée</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="py-1.5 pr-4 font-mono">_rc</td>
+                    <td className="py-1.5 pr-4">Mémorisation du consentement à la géolocalisation d'adresse</td>
+                    <td className="py-1.5">12 mois</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p className="text-xs text-sapin/50 italic mt-3">
+                Aucun cookie de géolocalisation n'est activé sans votre accord préalable.
+              </p>
+            </div>
           </div>
         </section>
       </Reveal>

@@ -1,13 +1,15 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
+import { geocodeAddress } from "@/src/lib/geocode";
 import Hero from "@/src/components/sections/Hero";
 import CatalogueLots, {
   type Lot,
-} from "@/src/components/sections/CatalogueLots";
+} from "./_components/CatalogueLots";
 import GestionLots from "@/src/components/sections/GestionLots";
 
 const LOT_FIELDS =
-  "id_lot, name_entreprise, adresse, adresse_recup, instructions, category, nature, quantity, dlc, montant_chiffre, montant_lettre, created_at";
+  "id_lot, name_entreprise, adresse, adresse_recup, instructions, category, nature, quantity, dlc, montant_chiffre, montant_lettre, created_at, lat, lng";
 
 export default async function LotPage() {
   const supabase = await createClient();
@@ -72,6 +74,31 @@ export default async function LotPage() {
 
   const lots = (lotsData ?? []) as Lot[];
 
+  let assoCoords: { lat: number; lng: number } | null = null;
+  if (!isAdmin && userRow) {
+    const { data: assoRow } = await supabase
+      .from("association")
+      .select("lat, lng, adresse")
+      .eq("id_user", userRow.id_user)
+      .maybeSingle();
+
+    if (assoRow) {
+      if (assoRow.lat && assoRow.lng) {
+        assoCoords = { lat: assoRow.lat, lng: assoRow.lng };
+      } else if (assoRow.adresse) {
+        const coords = await geocodeAddress(assoRow.adresse);
+        if (coords) {
+          assoCoords = coords;
+          const admin = createAdminClient();
+          await admin
+            .from("association")
+            .update({ lat: coords.lat, lng: coords.lng })
+            .eq("id_user", userRow.id_user);
+        }
+      }
+    }
+  }
+
   if (isAdmin) {
     return (
       <main>
@@ -106,7 +133,24 @@ export default async function LotPage() {
         secondaryButton="En savoir plus"
         secondaryButtonHref="/decouvrir-recolteo"
       />
-      <CatalogueLots lots={lots} showCartButton />
+      <CatalogueLots
+          lots={lots}
+          showCartButton
+          assoCoords={assoCoords}
+          sectionTitle="Lots"
+          sectionHighlight="disponibles"
+          description="Découvrez les invendus et ressources mis à disposition par nos commerçants partenaires. Chaque lot est une opportunité de lutter contre le gaspillage et de soutenir votre activité associative."
+          emptyTitle="Aucun lot disponible pour le moment"
+          emptySubtitle="Revenez prochainement, de nouveaux lots sont ajoutés régulièrement."
+          filterTitle="Affinez votre recherche"
+          filterDescription="Deux filtres sont à votre disposition : filtrez par proximité géographique autour de votre association, ou par date de publication pour voir les lots les plus récents en premier."
+          filterRadiusTitle="Par proximité"
+          filterRadiusDescription="Filtrez les lots selon la distance autour de vous."
+          filterDateTitle="Par date de parution"
+          filterDateDescription="Affichez les lots publiés sur une période précise."
+          filterEmptyTitle="Aucun lot ne correspond à vos filtres"
+          filterEmptySubtitle="Essayez d'élargir le rayon ou de changer la période."
+        />
     </main>
   );
 }

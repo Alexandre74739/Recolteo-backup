@@ -86,6 +86,13 @@ export default function PolitiqueDeConfidentialite() {
               <li className="mb-3">Cookies techniques nécessaires au fonctionnement du site</li>
             </ul>
           </div>
+
+          <div>
+            <p className="mb-3">Données de géolocalisation (associations uniquement, avec consentement)</p>
+            <ul>
+              <li className="mb-3">Coordonnées géographiques (latitude, longitude) dérivées de l'adresse postale via l'API de la Base Adresse Nationale</li>
+            </ul>
+          </div>
         </div>
       </section>
       </Reveal>
@@ -101,6 +108,7 @@ export default function PolitiqueDeConfidentialite() {
           <li className="mb-3">gérer les échanges et demandes entre utilisateurs ;</li>
           <li className="mb-3">sécuriser les comptes et prévenir les fraudes ;</li>
           <li className="mb-3">gérer les paiements et abonnements éventuels ;</li>
+          <li className="mb-3">proposer un filtre de proximité géographique aux associations ayant consenti à la géolocalisation de leur adresse ;</li>
           <li className="mb-3">respecter les obligations légales et réglementaires.</li>
         </ul>
       </section>
@@ -121,13 +129,22 @@ export default function PolitiqueDeConfidentialite() {
         <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">7. Paiements et prestataires tiers</h2>
         <p className="mb-3">Les paiements réalisés sur la plateforme sont traités via Stripe. Récoltéo ne stocke pas les données bancaires complètes des utilisateurs. Les informations de paiement sont traitées directement par Stripe conformément à leur propre politique de confidentialité.</p>
         <p className="mb-3">Récoltéo peut également faire appel à des prestataires techniques pour : l’hébergement du site, la maintenance, la sécurisation des services et l’envoi d’emails transactionnels. Ces prestataires n’accèdent aux données que dans la mesure nécessaire à leurs missions.</p>
+        <p className="mb-3">
+          Avec votre consentement, les adresses postales des associations sont transmises à l’
+          <strong>API de la Base Adresse Nationale</strong> (api-adresse.data.gouv.fr), un service
+          officiel de l’État français opéré par Etalab, afin de les convertir en coordonnées
+          géographiques. Ce service ne conserve pas les données transmises. Les coordonnées
+          obtenues sont stockées dans notre base de données afin d’alimenter le filtre de
+          proximité de la plateforme.
+        </p>
       </section>
       </Reveal>
 
       <Reveal delay={0.75}>
       <section className="mb-8">
         <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">8. Cookies</h2>
-        <p className="mb-3">Le site utilise uniquement des cookies techniques indispensables au fonctionnement de la plateforme. Ces cookies permettent notamment : la connexion sécurisée au compte utilisateur, le maintien de session, le bon affichage du site et la sécurité du service. Aucun cookie publicitaire ou de suivi marketing n’est utilisé.</p>
+        <p className="mb-3">Le site utilise des cookies nécessaires au fonctionnement de la plateforme (session, authentification) ainsi que des cookies optionnels soumis à votre consentement : cookies analytiques, fonctionnels et de géolocalisation d’adresse. Aucun cookie publicitaire ou de suivi marketing n’est utilisé.</p>
+        <p className="mb-3">Pour en savoir plus, consultez notre <a href="/cookies" className="underline hover:text-sapin/70 transition-colors">politique de gestion des cookies</a>.</p>
       </section>
       </Reveal>
 

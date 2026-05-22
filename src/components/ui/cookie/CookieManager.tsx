@@ -17,7 +17,11 @@ const subscribe = () => () => {};
 type Internal = { consent: CookieConsent; initialized: boolean };
 
 export default function CookieManager() {
-  const isClient = useSyncExternalStore(subscribe, () => true, () => false);
+  const isClient = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
 
   const [{ consent, initialized }, setInternal] = useState<Internal>({
     consent: DEFAULT_CONSENT,
@@ -66,10 +70,20 @@ export default function CookieManager() {
           <CookieBanner
             key="banner"
             onAcceptAll={() =>
-              persist({ analytiques: true, fonctionnels: true, consented: true })
+              persist({
+                analytiques: true,
+                fonctionnels: true,
+                geolocalisation: true,
+                consented: true,
+              })
             }
             onRejectAll={() =>
-              persist({ analytiques: false, fonctionnels: false, consented: true })
+              persist({
+                analytiques: false,
+                fonctionnels: false,
+                geolocalisation: false,
+                consented: true,
+              })
             }
             onCustomize={() => setPanelOpen(true)}
           />
@@ -83,10 +97,20 @@ export default function CookieManager() {
             draft={consent}
             onDraftChange={autoSave}
             onAcceptAll={() =>
-              persist({ analytiques: true, fonctionnels: true, consented: true })
+              persist({
+                analytiques: true,
+                fonctionnels: true,
+                geolocalisation: true,
+                consented: true,
+              })
             }
             onRejectAll={() =>
-              persist({ analytiques: false, fonctionnels: false, consented: true })
+              persist({
+                analytiques: false,
+                fonctionnels: false,
+                geolocalisation: false,
+                consented: true,
+              })
             }
             onClose={() => setPanelOpen(false)}
           />

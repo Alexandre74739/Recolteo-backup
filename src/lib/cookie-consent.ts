@@ -1,12 +1,14 @@
 export interface CookieConsent {
   analytiques: boolean;
   fonctionnels: boolean;
+  geolocalisation: boolean;
   consented: boolean;
 }
 
 export const DEFAULT_CONSENT: CookieConsent = {
   analytiques: false,
   fonctionnels: false,
+  geolocalisation: false,
   consented: false,
 };
 
@@ -24,12 +26,13 @@ function parseRawCookie(raw: string): string | null {
 }
 
 function isValidConsent(value: unknown): value is CookieConsent {
+  const v = value as Record<string, unknown>;
   return (
     typeof value === "object" &&
     value !== null &&
-    typeof (value as Record<string, unknown>).analytiques === "boolean" &&
-    typeof (value as Record<string, unknown>).fonctionnels === "boolean" &&
-    typeof (value as Record<string, unknown>).consented === "boolean"
+    typeof v.analytiques === "boolean" &&
+    typeof v.fonctionnels === "boolean" &&
+    typeof v.consented === "boolean"
   );
 }
 
@@ -42,6 +45,7 @@ export function readCookieConsent(): CookieConsent {
     return {
       analytiques: parsed.analytiques,
       fonctionnels: parsed.fonctionnels,
+      geolocalisation: typeof parsed.geolocalisation === "boolean" ? parsed.geolocalisation : false,
       consented: parsed.consented,
     };
   } catch {
@@ -49,11 +53,14 @@ export function readCookieConsent(): CookieConsent {
   }
 }
 
+export const CONSENT_CHANGE_EVENT = "cookie-consent-change";
+
 export function writeCookieConsent(consent: CookieConsent): void {
   const value = encodeURIComponent(
     JSON.stringify({
       analytiques: consent.analytiques,
       fonctionnels: consent.fonctionnels,
+      geolocalisation: consent.geolocalisation,
       consented: consent.consented,
     })
   );
@@ -62,4 +69,5 @@ export function writeCookieConsent(consent: CookieConsent): void {
       ? "; Secure"
       : "";
   document.cookie = `${KEY}=${value}; Max-Age=${MAX_AGE}; Path=/; SameSite=Strict${secure}`;
+  window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
 }

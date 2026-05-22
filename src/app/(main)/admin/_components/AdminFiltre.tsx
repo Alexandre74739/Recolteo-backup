@@ -146,7 +146,6 @@ export default function AdminFiltre({
                   details={[
                     { label: "RNA", value: a.rna },
                     { label: "Type", value: a.type_asso },
-                    { label: "Rayon d'action", value: `${a.rayon_action} km` },
                     { label: "Adresse", value: a.adresse },
                   ]}
                   createdAt={a.created_at}

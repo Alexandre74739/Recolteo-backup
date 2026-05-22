@@ -55,7 +55,7 @@ export default async function ProfilPage() {
       .maybeSingle(),
     supabase
       .from("association")
-      .select("name_entreprise, email, tel, rna, type_asso, rayon_action, adresse")
+      .select("name_entreprise, email, tel, rna, type_asso, adresse")
       .eq("id_user", userRow.id_user)
       .maybeSingle(),
   ]);

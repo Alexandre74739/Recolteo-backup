@@ -16,6 +16,8 @@ export interface Lot {
   montant_chiffre: number;
   montant_lettre: string;
   created_at: string;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export default function LotCard({

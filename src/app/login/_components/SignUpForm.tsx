@@ -1,10 +1,22 @@
 "use client";
 
-import { Fragment, startTransition, useActionState, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { signUp, type ActionState } from "../actions";
 import Input from "@/src/components/ui/primitives/Input";
 import Button from "@/src/components/ui/primitives/Button";
 import TabToggle from "@/src/components/ui/primitives/TabToggle";
+import Checkbox from "@/src/components/ui/primitives/Checkbox";
+import {
+  writeCookieConsent,
+  readCookieConsent,
+} from "@/src/lib/cookie-consent";
 
 type Role = "commercant" | "association";
 
@@ -27,7 +39,7 @@ type Step2Data = {
   adresse: string;
   rna: string;
   type_asso: string;
-  rayon_action: string;
+  accept_geolocation: boolean;
   siret: string;
   type_activity: string;
   forme_juridique: string;
@@ -44,7 +56,7 @@ function captureStep2(form: HTMLFormElement): Step2Data {
     adresse: (fd.get("adresse") as string) ?? "",
     rna: (fd.get("rna") as string) ?? "",
     type_asso: (fd.get("type_asso") as string) ?? "",
-    rayon_action: (fd.get("rayon_action") as string) ?? "",
+    accept_geolocation: fd.get("accept_geolocation") === "on",
     siret: (fd.get("siret") as string) ?? "",
     type_activity: (fd.get("type_activity") as string) ?? "",
     forme_juridique: (fd.get("forme_juridique") as string) ?? "",
@@ -67,7 +79,7 @@ export default function SignUpForm() {
     adresse: "",
     rna: "",
     type_asso: "",
-    rayon_action: "",
+    accept_geolocation: false,
     siret: "",
     type_activity: "",
     forme_juridique: "",
@@ -150,6 +162,16 @@ export default function SignUpForm() {
     }
 
     setLocalError(undefined);
+
+    if (s1.role === "association") {
+      const current = readCookieConsent();
+      writeCookieConsent({
+        ...current,
+        geolocalisation: s2.accept_geolocation,
+        consented: true,
+      });
+    }
+
     fd.append("password", s1.password);
     fd.append("confirmPassword", s1.confirmPassword);
     startTransition(() => action(fd));
@@ -325,16 +347,15 @@ export default function SignUpForm() {
                   defaultValue={s2.type_asso}
                 />
                 <div className="sm:col-span-2">
-                  <Input
-                    id="rayon_action"
-                    name="rayon_action"
-                    label="Rayon d'action (km)"
-                    type="number"
-                    required
-                    min={1}
-                    max={500}
-                    placeholder="20"
-                    defaultValue={s2.rayon_action}
+                  <Checkbox
+                    id="accept_geolocation"
+                    name="accept_geolocation"
+                    label="Autoriser la géolocalisation de mon adresse"
+                    description="Votre adresse sera géocodée via l'API officielle de la Base Adresse Nationale pour vous permettre de filtrer les lots par proximité. Modifiable à tout moment dans vos préférences cookies."
+                    checked={s2.accept_geolocation}
+                    onChange={(v) =>
+                      setS2((p) => ({ ...p, accept_geolocation: v }))
+                    }
                   />
                 </div>
               </>
