@@ -263,7 +263,7 @@ export async function reserverLots(
       });
 
       if (commercantEmailError) {
-        console.error(`Email commerçant ${commercant.email} :`, commercantEmailError.message);
+        console.error("Email commerçant non envoyé :", commercantEmailError.message);
         emailErrors.push(`Commerçant (${commercant.email}) : ${commercantEmailError.message}`);
       }
     })

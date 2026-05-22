@@ -2,73 +2,67 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FileText, Check, Shield } from "@deemlol/next-icons";
-import { createClient } from "@/src/lib/supabase/client";
 import { getAdminAllDocuments } from "@/src/lib/supabase/documents";
-import { BUCKET, DOC_LABELS, type DocType, type UserDocEntry } from "@/src/lib/supabase/documents-types";
+import { DOC_LABELS, type DocType, type UserDocEntry } from "@/src/lib/supabase/documents-types";
 import { DownloadAction, DeleteAction, UploadAction } from "@/src/components/ui/docs/DocAction";
-import { syncDocUpload, syncDocDelete } from "@/src/app/(main)/profil/doc-actions";
 
 const DOC_TYPES: DocType[] = ["rib", "kbis", "identite"];
 
-function DocCard({ type, authId }: { type: DocType; authId: string }) {
-  const supabase = useRef(createClient()).current;
-  const [url, setUrl] = useState<string | null>(null);
+function DocCard({ type }: { type: DocType }) {
+  const [exists, setExists] = useState<boolean | null>(null);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [checking, setChecking] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    (async () => {
-      const { data: files } = await supabase.storage.from(BUCKET).list(authId, { search: `${type}.pdf` });
-      if (!files?.length) { setChecking(false); return; }
-      const { data } = await supabase.storage.from(BUCKET).createSignedUrl(`${authId}/${type}.pdf`, 3600);
-      setUrl(data?.signedUrl ?? null);
-      setChecking(false);
-    })();
-  }, [authId, type]);
+    fetch(`/api/docs/${type}`, { method: "HEAD" })
+      .then((r) => setExists(r.ok))
+      .catch(() => setExists(false));
+  }, [type]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const path = `${authId}/${type}.pdf`;
-    await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });
-    const { data } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600);
-    setUrl(data?.signedUrl ?? null);
-    await syncDocUpload(type, path);
+    const form = new FormData();
+    form.set("file", file);
+    const res = await fetch(`/api/docs/${type}`, { method: "POST", body: form });
+    if (res.ok) setExists(true);
     setUploading(false);
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   const handleDelete = async () => {
     setDeleting(true);
-    await supabase.storage.from(BUCKET).remove([`${authId}/${type}.pdf`]);
-    await syncDocDelete(type);
-    setUrl(null);
+    await fetch(`/api/docs/${type}`, { method: "DELETE" });
+    setExists(false);
     setDeleting(false);
   };
+
+  const checking = exists === null;
 
   return (
     <div className="flex items-center gap-4 py-5 border-b border-sapin/8 last:border-0">
       <div className="w-12 h-12 rounded-xl bg-lime border border-sapin shadow-[2px_2px_0_0_#06573F] flex items-center justify-center shrink-0">
         {checking
           ? <div className="w-4 h-4 rounded-full border-2 border-sapin/30 border-t-sapin animate-spin" />
-          : url ? <Check size={18} className="text-sapin" />
+          : exists
+          ? <Check size={18} className="text-sapin" />
           : <FileText size={18} className="text-sapin" />}
       </div>
       <div className="flex-1 min-w-0">
         <span className="block font-black text-sapin leading-tight text-xl">{DOC_LABELS[type]}</span>
         <div className="flex items-center gap-1.5 mt-1.5">
-          <div className={`w-2 h-2 rounded-full shrink-0 ${url ? "bg-lime border border-sapin/30" : "bg-sapin/15"}`} />
+          <div className={`w-2 h-2 rounded-full shrink-0 ${exists ? "bg-lime border border-sapin/30" : "bg-sapin/15"}`} />
           <span className="text-sm text-sapin/60 font-medium">
-            {checking ? "Vérification…" : url ? "Document déposé" : "Non déposé · PDF uniquement"}
+            {checking ? "Vérification…" : exists ? "Document déposé" : "Non déposé · PDF uniquement"}
           </span>
         </div>
       </div>
       <div className="flex gap-1.5 shrink-0">
-        {url ? (
+        {exists ? (
           <>
-            <DownloadAction href={url} />
+            <DownloadAction href={`/api/docs/${type}`} />
             <DeleteAction onDelete={handleDelete} loading={deleting} />
           </>
         ) : (
@@ -119,14 +113,14 @@ function AdminDocsView() {
   );
 }
 
-export default function DocsTab({ role, authId }: { role: "commercant" | "association" | "admin"; authId: string }) {
+export default function DocsTab({ role }: { role: "commercant" | "association" | "admin"; authId: string }) {
   if (role === "admin") return <AdminDocsView />;
   return (
     <div>
       <p className="text-sapin/50 mb-5">
-        Vos documents sont sécurisés et accessibles uniquement par l'équipe Récoltéo.
+        Vos documents sont chiffrés (AES-256-GCM) et accessibles uniquement par l'équipe Récoltéo.
       </p>
-      {DOC_TYPES.map((type) => <DocCard key={type} type={type} authId={authId} />)}
+      {DOC_TYPES.map((type) => <DocCard key={type} type={type} />)}
     </div>
   );
 }

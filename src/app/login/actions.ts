@@ -104,7 +104,7 @@ export async function signUp(
 
   const { data: userRow, error: userError } = await admin
     .from("user")
-    .insert({ email, mot_de_passe: "supabase_managed", nom, auth_id: authId })
+    .insert({ email, nom, auth_id: authId })
     .select("id_user")
     .single();
 
@@ -120,7 +120,6 @@ export async function signUp(
       id_user: idUser,
       tel,
       email,
-      mot_de_passe: "supabase_managed",
       siret,
       name_entreprise: nameEntreprise,
       adresse: (formData.get("adresse") as string).trim().slice(0, 300),
@@ -146,7 +145,6 @@ export async function signUp(
         id_user: idUser,
         tel,
         email,
-        mot_de_passe: "supabase_managed",
         rna,
         name_entreprise: nameEntreprise,
         adresse: assoAdresse,
@@ -166,12 +164,15 @@ export async function signUp(
       return { error: "Erreur lors de la création du profil. Réessayez." };
     }
 
-    const coords = await geocodeAddress(assoAdresse);
-    if (coords) {
-      await admin
-        .from("association")
-        .update({ lat: coords.lat, lng: coords.lng })
-        .eq("id_association", insertedAsso.id_association);
+    const acceptGeolocation = formData.get("accept_geolocation") === "on";
+    if (acceptGeolocation) {
+      const coords = await geocodeAddress(assoAdresse);
+      if (coords) {
+        await admin
+          .from("association")
+          .update({ lat: coords.lat, lng: coords.lng })
+          .eq("id_association", insertedAsso.id_association);
+      }
     }
   }
 

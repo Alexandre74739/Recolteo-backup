@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { MapPin, Calendar, Tag, ChevronDown } from "@deemlol/next-icons";
 import {
   readCookieConsent,
-  CONSENT_CHANGE_EVENT,
+  openCookiePanel,
+  onConsentChange,
+  offConsentChange,
 } from "@/src/lib/cookie-consent";
 import RadiusSlider, {
   RADIUS_STEPS,
@@ -85,8 +87,8 @@ export default function CatalogueLotsFilter({
   useEffect(() => {
     const update = () => setGeoEnabled(readCookieConsent().geolocalisation);
     update();
-    window.addEventListener(CONSENT_CHANGE_EVENT, update);
-    return () => window.removeEventListener(CONSENT_CHANGE_EVENT, update);
+    onConsentChange(update);
+    return () => offConsentChange(update);
   }, []);
 
   const categories = Array.from(new Set(lots.map((l) => l.category))).sort();
@@ -170,19 +172,33 @@ export default function CatalogueLotsFilter({
             <div className="px-6 pb-6 flex flex-col gap-6">
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
-                <FilterPart
-                  icon={<MapPin size={20} />}
-                  title={radiusTitle}
-                  subtitle={radiusDescription}
-                  isActive={applyRadius}
-                >
-                  <RadiusSlider
-                    value={radiusIndex}
-                    onChange={setRadiusIndex}
-                    withOff
-                    disabled={!canUseRadius}
-                  />
-                </FilterPart>
+                <div className="relative">
+                  <FilterPart
+                    icon={<MapPin size={20} />}
+                    title={radiusTitle}
+                    subtitle={radiusDescription}
+                    isActive={applyRadius}
+                  >
+                    <RadiusSlider
+                      value={radiusIndex}
+                      onChange={setRadiusIndex}
+                      withOff
+                      disabled={!canUseRadius}
+                    />
+                    {!geoEnabled && (
+                      <p className="text-xs text-sapin/50 mt-1">
+                        <button
+                          type="button"
+                          onClick={openCookiePanel}
+                          className="underline hover:text-sapin transition-colors"
+                        >
+                          Activez les cookies de géolocalisation
+                        </button>{" "}
+                        pour utiliser ce filtre.
+                      </p>
+                    )}
+                  </FilterPart>
+                </div>
 
                 <FilterPart
                   icon={<Calendar size={20} />}
@@ -217,14 +233,14 @@ export default function CatalogueLotsFilter({
                             type="button"
                             onClick={() => toggleCategory(cat)}
                             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold transition-all duration-150 ${checked
-                                ? "bg-sapin text-lime border-sapin"
-                                : "bg-lime/20 text-sapin/60 border-sapin/20 hover:border-sapin/50 hover:text-sapin hover:bg-lime/40"
+                              ? "bg-sapin text-lime border-sapin"
+                              : "bg-lime/20 text-sapin/60 border-sapin/20 hover:border-sapin/50 hover:text-sapin hover:bg-lime/40"
                               }`}
                           >
                             <span
                               className={`w-3.5 h-3.5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-colors ${checked
-                                  ? "bg-lime border-lime"
-                                  : "border-current opacity-50"
+                                ? "bg-lime border-lime"
+                                : "border-current opacity-50"
                                 }`}
                             >
                               {checked && (

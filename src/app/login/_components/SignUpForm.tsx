@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Link from "next/link";
 import { signUp, type ActionState } from "../actions";
 import Input from "@/src/components/ui/primitives/Input";
 import Button from "@/src/components/ui/primitives/Button";
@@ -84,6 +85,7 @@ export default function SignUpForm() {
     type_activity: "",
     forme_juridique: "",
   });
+  const [acceptsCgu, setAcceptsCgu] = useState(false);
   const [localError, setLocalError] = useState<string>();
   const step2FormRef = useRef<HTMLFormElement>(null);
 
@@ -161,6 +163,11 @@ export default function SignUpForm() {
       fd.set("siret", siret);
     }
 
+    if (!acceptsCgu) {
+      setLocalError("Veuillez accepter les CGU et la politique de confidentialité pour continuer.");
+      return;
+    }
+
     setLocalError(undefined);
 
     if (s1.role === "association") {
@@ -185,22 +192,20 @@ export default function SignUpForm() {
         {([1, 2] as const).map((n, i) => (
           <Fragment key={n}>
             <div
-              className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-                step === n
+              className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${step === n
                   ? "text-sapin"
                   : step > n
                     ? "text-sapin/60"
                     : "text-sapin/25"
-              }`}
+                }`}
             >
               <span
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all ${
-                  step > n
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all ${step > n
                     ? "bg-sapin border-sapin text-cream"
                     : step === n
                       ? "border-sapin bg-sapin/10 text-sapin"
                       : "border-sapin/20 text-sapin/30"
-                }`}
+                  }`}
               >
                 {step > n ? "✓" : n}
               </span>
@@ -209,9 +214,8 @@ export default function SignUpForm() {
             {i === 0 && (
               <div
                 key="sep"
-                className={`flex-1 h-0.5 rounded-full transition-all duration-300 ${
-                  step > 1 ? "bg-sapin/40" : "bg-sapin/10"
-                }`}
+                className={`flex-1 h-0.5 rounded-full transition-all duration-300 ${step > 1 ? "bg-sapin/40" : "bg-sapin/10"
+                  }`}
               />
             )}
           </Fragment>
@@ -389,6 +393,27 @@ export default function SignUpForm() {
                 </div>
               </>
             )}
+          </div>
+
+          <div className="flex items-start gap-3 p-4 bg-sapin/5 border border-sapin/10 rounded-xl">
+            <input
+              type="checkbox"
+              id="accept_cgu"
+              checked={acceptsCgu}
+              onChange={(e) => setAcceptsCgu(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-sapin shrink-0 cursor-pointer"
+            />
+            <label htmlFor="accept_cgu" className="text-sm text-sapin/80 leading-relaxed cursor-pointer">
+              J'ai lu et j'accepte les{" "}
+              <Link href="/mentions-legales" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-sapin transition-colors">
+                Conditions Générales d'Utilisation
+              </Link>{" "}
+              et la{" "}
+              <Link href="/politique-de-confidentialite" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-sapin transition-colors">
+                politique de confidentialité
+              </Link>{" "}
+              de Récoltéo. <span className="text-peach font-semibold">*</span>
+            </label>
           </div>
 
           {(localError || (state.error && !isTelError)) && (

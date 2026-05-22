@@ -3,6 +3,7 @@ export interface CookieConsent {
   fonctionnels: boolean;
   geolocalisation: boolean;
   consented: boolean;
+  consentedAt: string | null;
 }
 
 export const DEFAULT_CONSENT: CookieConsent = {
@@ -10,6 +11,7 @@ export const DEFAULT_CONSENT: CookieConsent = {
   fonctionnels: false,
   geolocalisation: false,
   consented: false,
+  consentedAt: null,
 };
 
 const KEY = "_rc";
@@ -32,6 +34,7 @@ function isValidConsent(value: unknown): value is CookieConsent {
     value !== null &&
     typeof v.analytiques === "boolean" &&
     typeof v.fonctionnels === "boolean" &&
+    typeof v.geolocalisation === "boolean" &&
     typeof v.consented === "boolean"
   );
 }
@@ -45,15 +48,36 @@ export function readCookieConsent(): CookieConsent {
     return {
       analytiques: parsed.analytiques,
       fonctionnels: parsed.fonctionnels,
-      geolocalisation: typeof parsed.geolocalisation === "boolean" ? parsed.geolocalisation : false,
+      geolocalisation: parsed.geolocalisation,
       consented: parsed.consented,
+      consentedAt: typeof parsed.consentedAt === "string" ? parsed.consentedAt : null,
     };
   } catch {
     return DEFAULT_CONSENT;
   }
 }
 
-export const CONSENT_CHANGE_EVENT = "cookie-consent-change";
+const CONSENT_CHANGE_EVENT =
+  process.env.NEXT_PUBLIC_CONSENT_EVENT ?? "cc_change";
+
+export function onConsentChange(callback: () => void): void {
+  window.addEventListener(CONSENT_CHANGE_EVENT, callback);
+}
+
+export function offConsentChange(callback: () => void): void {
+  window.removeEventListener(CONSENT_CHANGE_EVENT, callback);
+}
+
+let _openPanel: (() => void) | null = null;
+
+export function registerOpenPanel(fn: () => void): () => void {
+  _openPanel = fn;
+  return () => { _openPanel = null; };
+}
+
+export function openCookiePanel(): void {
+  _openPanel?.();
+}
 
 export function writeCookieConsent(consent: CookieConsent): void {
   const value = encodeURIComponent(
@@ -62,6 +86,7 @@ export function writeCookieConsent(consent: CookieConsent): void {
       fonctionnels: consent.fonctionnels,
       geolocalisation: consent.geolocalisation,
       consented: consent.consented,
+      consentedAt: new Date().toISOString(),
     })
   );
   const secure =

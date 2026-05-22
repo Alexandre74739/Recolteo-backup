@@ -65,7 +65,9 @@ export default function CookiesPage() {
                 Ces cookies sont indispensables au fonctionnement du site. Ils
                 assurent la sécurité des sessions, l'authentification et le bon
                 déroulement des fonctionnalités essentielles. Ils ne peuvent pas
-                être désactivés.
+                être désactivés. Le cookie <span className="font-mono text-xs">_rc</span> est
+                exempt de consentement au sens de l'Art. 82 de la loi Informatique et Libertés
+                car il a pour finalité exclusive de mémoriser votre choix de consentement.
               </p>
               <table className="w-full text-xs text-sapin/70 border-collapse">
                 <thead>
@@ -83,7 +85,7 @@ export default function CookiesPage() {
                   </tr>
                   <tr>
                     <td className="py-1.5 pr-4 font-mono">_rc</td>
-                    <td className="py-1.5 pr-4">Mémorisation de vos préférences cookies</td>
+                    <td className="py-1.5 pr-4">Mémorisation de vos préférences cookies (analytiques, fonctionnels, géolocalisation) et horodatage du consentement (<span className="font-mono">consentedAt</span>)</td>
                     <td className="py-1.5">12 mois</td>
                   </tr>
                 </tbody>
@@ -129,24 +131,8 @@ export default function CookiesPage() {
                 jamais transmises à des tiers. Aucune donnée de position GPS de votre appareil
                 n'est collectée.
               </p>
-              <table className="w-full text-xs text-sapin/70 border-collapse">
-                <thead>
-                  <tr className="border-b border-sapin/10">
-                    <th className="text-left py-1 pr-4 font-semibold">Nom</th>
-                    <th className="text-left py-1 pr-4 font-semibold">Finalité</th>
-                    <th className="text-left py-1 font-semibold">Durée</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="py-1.5 pr-4 font-mono">_rc</td>
-                    <td className="py-1.5 pr-4">Mémorisation du consentement à la géolocalisation d'adresse</td>
-                    <td className="py-1.5">12 mois</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p className="text-xs text-sapin/50 italic mt-3">
-                Aucun cookie de géolocalisation n'est activé sans votre accord préalable.
+              <p className="text-xs text-sapin/50 italic">
+                Aucun cookie de géolocalisation n'est activé sans votre accord préalable. Le consentement est mémorisé dans le cookie <span className="font-mono">_rc</span> (voir Cookies nécessaires).
               </p>
             </div>
           </div>
@@ -156,7 +142,43 @@ export default function CookiesPage() {
       <Reveal delay={0.95}>
         <section className="mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">
-            3. Durée de conservation
+            3. Stockage local (localStorage)
+          </h2>
+          <p className="mb-4">
+            En complément des cookies, Récoltéo utilise le stockage local du navigateur (<span className="font-mono text-sm">localStorage</span>) pour améliorer votre expérience. Ces données restent sur votre appareil et ne sont jamais transmises à nos serveurs.
+          </p>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40">
+            <h3 className="font-bold text-sapin mb-2">Stockage fonctionnel</h3>
+            <p className="text-sm text-sapin/70 mb-3">
+              Ces données sont stockées uniquement avec votre consentement aux cookies fonctionnels et sont supprimées lorsque vous retirez ce consentement.
+            </p>
+            <table className="w-full text-xs text-sapin/70 border-collapse">
+              <thead>
+                <tr className="border-b border-sapin/10">
+                  <th className="text-left py-1 pr-4 font-semibold">Clé</th>
+                  <th className="text-left py-1 pr-4 font-semibold">Finalité</th>
+                  <th className="text-left py-1 font-semibold">Durée</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-1.5 pr-4 font-mono">recolteo_cart</td>
+                  <td className="py-1.5 pr-4">Mémorisation du contenu de votre panier entre les sessions</td>
+                  <td className="py-1.5">Session / jusqu'au vidage</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-sapin/50 italic mt-3">
+            Vous pouvez effacer le stockage local à tout moment via les paramètres de votre navigateur (Outils → Données du site).
+          </p>
+        </section>
+      </Reveal>
+
+      <Reveal delay={1.1}>
+        <section className="mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">
+            4. Durée de conservation
           </h2>
           <p className="mb-3">
             Conformément aux recommandations de la CNIL, la durée de validité du
@@ -173,7 +195,7 @@ export default function CookiesPage() {
       <Reveal delay={1.1}>
         <section className="mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">
-            4. Gérer vos préférences
+            5. Gérer vos préférences
           </h2>
           <p className="mb-3">
             Vous pouvez modifier vos préférences à tout moment en cliquant sur
@@ -223,7 +245,7 @@ export default function CookiesPage() {
       <Reveal delay={1.25}>
         <section className="mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">
-            5. Vos droits
+            6. Vos droits
           </h2>
           <p className="mb-3">
             Conformément au RGPD, vous disposez des droits suivants concernant
@@ -264,7 +286,7 @@ export default function CookiesPage() {
       <Reveal delay={1.4}>
         <section className="mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">
-            6. Contact
+            7. Contact
           </h2>
           <p className="mb-3">
             Pour toute question relative à cette politique ou à l'utilisation de

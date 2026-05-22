@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Cookie } from "@deemlol/next-icons";
 import {
   readCookieConsent,
   writeCookieConsent,
   DEFAULT_CONSENT,
+  registerOpenPanel,
   type CookieConsent,
 } from "@/src/lib/cookie-consent";
 import CookieBanner from "@/src/components/ui/cookie/CookieBanner";
 import CookiePanel from "@/src/components/ui/cookie/CookiePanel";
 
-const subscribe = () => () => {};
+const subscribe = () => () => { };
 
 type Internal = { consent: CookieConsent; initialized: boolean };
 
@@ -32,6 +33,8 @@ export default function CookieManager() {
   if (isClient && !initialized) {
     setInternal({ consent: readCookieConsent(), initialized: true });
   }
+
+  useEffect(() => registerOpenPanel(() => setPanelOpen(true)), []);
 
   if (!isClient) return null;
 
@@ -75,6 +78,7 @@ export default function CookieManager() {
                 fonctionnels: true,
                 geolocalisation: true,
                 consented: true,
+                consentedAt: null,
               })
             }
             onRejectAll={() =>
@@ -83,6 +87,7 @@ export default function CookieManager() {
                 fonctionnels: false,
                 geolocalisation: false,
                 consented: true,
+                consentedAt: null,
               })
             }
             onCustomize={() => setPanelOpen(true)}
@@ -102,6 +107,7 @@ export default function CookieManager() {
                 fonctionnels: true,
                 geolocalisation: true,
                 consented: true,
+                consentedAt: null,
               })
             }
             onRejectAll={() =>
@@ -110,6 +116,7 @@ export default function CookieManager() {
                 fonctionnels: false,
                 geolocalisation: false,
                 consented: true,
+                consentedAt: null,
               })
             }
             onClose={() => setPanelOpen(false)}
