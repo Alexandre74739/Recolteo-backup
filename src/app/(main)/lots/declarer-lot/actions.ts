@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
+import { geocodeAddress } from "@/src/lib/geocode";
 
 export type LotActionState = {
   error?: string;
@@ -35,24 +36,37 @@ export async function declarerLot(
   const categoryCustom = ((formData.get("category_custom") as string) || "").trim();
   const category = categorySelect === "autre" ? categoryCustom : categorySelect;
 
+  const adresse_recup = (formData.get("adresse_recup") as string).trim();
   const admin = createAdminClient();
-  const { error } = await admin.from("lot").insert({
-    id_commercant: parseInt(formData.get("id_commercant") as string, 10),
-    name_entreprise: (formData.get("name_entreprise") as string).trim(),
-    adresse: (formData.get("adresse") as string).trim(),
-    adresse_recup: (formData.get("adresse_recup") as string).trim(),
-    instructions: ((formData.get("instructions") as string) || "").trim() || null,
-    category,
-    nature: (formData.get("nature") as string).trim(),
-    quantity: parseFloat(formData.get("quantity") as string),
-    dlc: (formData.get("DLC") as string) || null,
-    montant_chiffre: parseFloat(formData.get("montant_chiffre") as string),
-    montant_lettre: (formData.get("montant_lettre") as string).trim(),
-    statut: true,
-  });
+  const { data: inserted, error } = await admin
+    .from("lot")
+    .insert({
+      id_commercant: parseInt(formData.get("id_commercant") as string, 10),
+      name_entreprise: (formData.get("name_entreprise") as string).trim(),
+      adresse: (formData.get("adresse") as string).trim(),
+      adresse_recup,
+      instructions: ((formData.get("instructions") as string) || "").trim() || null,
+      category,
+      nature: (formData.get("nature") as string).trim(),
+      quantity: parseFloat(formData.get("quantity") as string),
+      dlc: (formData.get("DLC") as string) || null,
+      montant_chiffre: parseFloat(formData.get("montant_chiffre") as string),
+      montant_lettre: (formData.get("montant_lettre") as string).trim(),
+      statut: true,
+    })
+    .select("id_lot")
+    .single();
 
-  if (error) {
-    return { error: `Erreur lors de la déclaration : ${error.message}` };
+  if (error || !inserted) {
+    return { error: `Erreur lors de la déclaration : ${error?.message}` };
+  }
+
+  const coords = await geocodeAddress(adresse_recup);
+  if (coords) {
+    await admin
+      .from("lot")
+      .update({ lat: coords.lat, lng: coords.lng })
+      .eq("id_lot", inserted.id_lot);
   }
 
   redirect("/lots");

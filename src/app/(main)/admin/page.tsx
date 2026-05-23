@@ -54,7 +54,7 @@ export default async function AdminPage({
       ? supabase
           .from("association")
           .select(
-            "id_association, name_entreprise, email, tel, type_asso, rayon_action, adresse, rna, created_at",
+            "id_association, name_entreprise, email, tel, type_asso, adresse, rna, created_at",
             { count: "exact" },
           )
           .eq("is_validated", false)

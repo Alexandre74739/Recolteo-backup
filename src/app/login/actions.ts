@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { notifyAdminNewProfile } from "@/src/lib/email";
+import { geocodeAddress } from "@/src/lib/geocode";
 
 export type ActionState = {
   error?: string;
@@ -74,7 +75,6 @@ export async function signUp(
 
   let siret = "";
   let rna = "";
-  let rayonAction = 0;
 
   if (role === "commercant") {
     siret = (formData.get("siret") as string).replace(/\s/g, "");
@@ -85,10 +85,6 @@ export async function signUp(
     rna = (formData.get("rna") as string).trim().toUpperCase();
     if (!RNA_RE.test(rna)) {
       return { error: "Le numéro RNA doit commencer par W suivi de 9 chiffres (ex : W751000000)." };
-    }
-    rayonAction = parseInt(formData.get("rayon_action") as string, 10);
-    if (isNaN(rayonAction) || rayonAction < 1 || rayonAction > 500) {
-      return { error: "Le rayon d'action doit être compris entre 1 et 500 km." };
     }
   }
 
@@ -108,7 +104,7 @@ export async function signUp(
 
   const { data: userRow, error: userError } = await admin
     .from("user")
-    .insert({ email, mot_de_passe: "supabase_managed", nom, auth_id: authId })
+    .insert({ email, nom, auth_id: authId })
     .select("id_user")
     .single();
 
@@ -124,7 +120,6 @@ export async function signUp(
       id_user: idUser,
       tel,
       email,
-      mot_de_passe: "supabase_managed",
       siret,
       name_entreprise: nameEntreprise,
       adresse: (formData.get("adresse") as string).trim().slice(0, 300),
@@ -143,27 +138,41 @@ export async function signUp(
       return { error: "Erreur lors de la création du profil. Réessayez." };
     }
   } else {
-    const { error: assoError } = await admin.from("association").insert({
-      id_user: idUser,
-      tel,
-      email,
-      mot_de_passe: "supabase_managed",
-      rna,
-      name_entreprise: nameEntreprise,
-      adresse: (formData.get("adresse") as string).trim().slice(0, 300),
-      type_asso: (formData.get("type_asso") as string).trim().slice(0, 100),
-      rayon_action: rayonAction,
-      is_validated: false,
-    });
+    const assoAdresse = (formData.get("adresse") as string).trim().slice(0, 300);
+    const { data: insertedAsso, error: assoError } = await admin
+      .from("association")
+      .insert({
+        id_user: idUser,
+        tel,
+        email,
+        rna,
+        name_entreprise: nameEntreprise,
+        adresse: assoAdresse,
+        type_asso: (formData.get("type_asso") as string).trim().slice(0, 100),
+        is_validated: false,
+      })
+      .select("id_association")
+      .single();
 
-    if (assoError) {
+    if (assoError || !insertedAsso) {
       await admin.auth.admin.deleteUser(authId);
       await admin.from("user").delete().eq("id_user", idUser);
-      if (assoError.code === "23505") {
+      if (assoError?.code === "23505") {
         if (assoError.message.includes("tel")) return { error: "Ce numéro de téléphone est déjà associé à un compte." };
         if (assoError.message.includes("rna")) return { error: "Ce numéro RNA est déjà associé à un compte." };
       }
       return { error: "Erreur lors de la création du profil. Réessayez." };
+    }
+
+    const acceptGeolocation = formData.get("accept_geolocation") === "on";
+    if (acceptGeolocation) {
+      const coords = await geocodeAddress(assoAdresse);
+      if (coords) {
+        await admin
+          .from("association")
+          .update({ lat: coords.lat, lng: coords.lng })
+          .eq("id_association", insertedAsso.id_association);
+      }
     }
   }
 

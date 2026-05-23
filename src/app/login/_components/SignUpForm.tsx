@@ -1,10 +1,23 @@
 "use client";
 
-import { Fragment, useActionState, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import Link from "next/link";
 import { signUp, type ActionState } from "../actions";
 import Input from "@/src/components/ui/primitives/Input";
 import Button from "@/src/components/ui/primitives/Button";
 import TabToggle from "@/src/components/ui/primitives/TabToggle";
+import Checkbox from "@/src/components/ui/primitives/Checkbox";
+import {
+  writeCookieConsent,
+  readCookieConsent,
+} from "@/src/lib/cookie-consent";
 
 type Role = "commercant" | "association";
 
@@ -27,7 +40,7 @@ type Step2Data = {
   adresse: string;
   rna: string;
   type_asso: string;
-  rayon_action: string;
+  accept_geolocation: boolean;
   siret: string;
   type_activity: string;
   forme_juridique: string;
@@ -44,7 +57,7 @@ function captureStep2(form: HTMLFormElement): Step2Data {
     adresse: (fd.get("adresse") as string) ?? "",
     rna: (fd.get("rna") as string) ?? "",
     type_asso: (fd.get("type_asso") as string) ?? "",
-    rayon_action: (fd.get("rayon_action") as string) ?? "",
+    accept_geolocation: fd.get("accept_geolocation") === "on",
     siret: (fd.get("siret") as string) ?? "",
     type_activity: (fd.get("type_activity") as string) ?? "",
     forme_juridique: (fd.get("forme_juridique") as string) ?? "",
@@ -67,11 +80,12 @@ export default function SignUpForm() {
     adresse: "",
     rna: "",
     type_asso: "",
-    rayon_action: "",
+    accept_geolocation: false,
     siret: "",
     type_activity: "",
     forme_juridique: "",
   });
+  const [acceptsCgu, setAcceptsCgu] = useState(false);
   const [localError, setLocalError] = useState<string>();
   const step2FormRef = useRef<HTMLFormElement>(null);
 
@@ -149,10 +163,25 @@ export default function SignUpForm() {
       fd.set("siret", siret);
     }
 
+    if (!acceptsCgu) {
+      setLocalError("Veuillez accepter les CGU et la politique de confidentialité pour continuer.");
+      return;
+    }
+
     setLocalError(undefined);
+
+    if (s1.role === "association") {
+      const current = readCookieConsent();
+      writeCookieConsent({
+        ...current,
+        geolocalisation: s2.accept_geolocation,
+        consented: true,
+      });
+    }
+
     fd.append("password", s1.password);
     fd.append("confirmPassword", s1.confirmPassword);
-    action(fd);
+    startTransition(() => action(fd));
   }
 
   const isAsso = s1.role === "association";
@@ -163,22 +192,20 @@ export default function SignUpForm() {
         {([1, 2] as const).map((n, i) => (
           <Fragment key={n}>
             <div
-              className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-                step === n
+              className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${step === n
                   ? "text-sapin"
                   : step > n
                     ? "text-sapin/60"
                     : "text-sapin/25"
-              }`}
+                }`}
             >
               <span
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all ${
-                  step > n
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all ${step > n
                     ? "bg-sapin border-sapin text-cream"
                     : step === n
                       ? "border-sapin bg-sapin/10 text-sapin"
                       : "border-sapin/20 text-sapin/30"
-                }`}
+                  }`}
               >
                 {step > n ? "✓" : n}
               </span>
@@ -187,9 +214,8 @@ export default function SignUpForm() {
             {i === 0 && (
               <div
                 key="sep"
-                className={`flex-1 h-0.5 rounded-full transition-all duration-300 ${
-                  step > 1 ? "bg-sapin/40" : "bg-sapin/10"
-                }`}
+                className={`flex-1 h-0.5 rounded-full transition-all duration-300 ${step > 1 ? "bg-sapin/40" : "bg-sapin/10"
+                  }`}
               />
             )}
           </Fragment>
@@ -325,16 +351,15 @@ export default function SignUpForm() {
                   defaultValue={s2.type_asso}
                 />
                 <div className="sm:col-span-2">
-                  <Input
-                    id="rayon_action"
-                    name="rayon_action"
-                    label="Rayon d'action (km)"
-                    type="number"
-                    required
-                    min={1}
-                    max={500}
-                    placeholder="20"
-                    defaultValue={s2.rayon_action}
+                  <Checkbox
+                    id="accept_geolocation"
+                    name="accept_geolocation"
+                    label="Autoriser la géolocalisation de mon adresse"
+                    description="Votre adresse sera géocodée via l'API officielle de la Base Adresse Nationale pour vous permettre de filtrer les lots par proximité. Modifiable à tout moment dans vos préférences cookies."
+                    checked={s2.accept_geolocation}
+                    onChange={(v) =>
+                      setS2((p) => ({ ...p, accept_geolocation: v }))
+                    }
                   />
                 </div>
               </>
@@ -368,6 +393,27 @@ export default function SignUpForm() {
                 </div>
               </>
             )}
+          </div>
+
+          <div className="flex items-start gap-3 p-4 bg-sapin/5 border border-sapin/10 rounded-xl">
+            <input
+              type="checkbox"
+              id="accept_cgu"
+              checked={acceptsCgu}
+              onChange={(e) => setAcceptsCgu(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-sapin shrink-0 cursor-pointer"
+            />
+            <label htmlFor="accept_cgu" className="text-sm text-sapin/80 leading-relaxed cursor-pointer">
+              J'ai lu et j'accepte les{" "}
+              <Link href="/mentions-legales" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-sapin transition-colors">
+                Conditions Générales d'Utilisation
+              </Link>{" "}
+              et la{" "}
+              <Link href="/politique-de-confidentialite" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-sapin transition-colors">
+                politique de confidentialité
+              </Link>{" "}
+              de Récoltéo. <span className="text-peach font-semibold">*</span>
+            </label>
           </div>
 
           {(localError || (state.error && !isTelError)) && (

@@ -16,7 +16,6 @@ type EntityInfo =
       tel: string;
       rna: string;
       type_asso: string;
-      rayon_action: number;
       adresse: string;
     }
   | { role: "admin"; nom: string; prenom: string };
@@ -73,7 +72,6 @@ export default function InfoTab({ entityInfo }: { entityInfo: EntityInfo | null 
       {common}
       <InfoRow label="RNA" value={entityInfo.rna} />
       <InfoRow label="Type" value={entityInfo.type_asso} />
-      <InfoRow label="Rayon d'action" value={`${entityInfo.rayon_action} km`} />
     </div>
   );
 }

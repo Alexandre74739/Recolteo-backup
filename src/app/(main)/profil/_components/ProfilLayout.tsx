@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Clock, UserX, Shield } from "@deemlol/next-icons";
+import EmptyState from "@/src/components/ui/primitives/EmptyState";
 import { signOut } from "@/src/app/login/actions";
 import Button from "@/src/components/ui/primitives/Button";
 import TabToggle from "@/src/components/ui/primitives/TabToggle";
@@ -10,14 +11,20 @@ import Reveal from "@/src/components/animations/Reveal";
 import ProfilHeader from "./ProfilHeader";
 import InfoTab, { type EntityInfo } from "./InfoTab";
 import DocsTab from "./DocsTab";
+import BreachTab from "./BreachTab";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 
-type Tab = "info" | "docs" | "historique";
+type Tab = "info" | "docs" | "historique" | "securite";
 
-const TABS = [
+const BASE_TABS = [
   { value: "info", label: "Informations" },
   { value: "docs", label: "Documents" },
   { value: "historique", label: "Historique" },
+];
+
+const ADMIN_TABS = [
+  ...BASE_TABS,
+  { value: "securite", label: "Sécurité" },
 ];
 
 const ROLE_SUBTITLE: Record<"commercant" | "association" | "admin", string> = {
@@ -59,7 +66,7 @@ export default function ProfilLayout({
       <Reveal delay={0.16}>
         <div className="flex flex-col gap-5">
           <TabToggle
-            tabs={TABS}
+            tabs={role === "admin" ? ADMIN_TABS : BASE_TABS}
             active={tab}
             onChange={(v) => setTab(v as Tab)}
             fullWidth
@@ -67,19 +74,13 @@ export default function ProfilLayout({
           <div className="min-h-72">
             {tab === "info" && <InfoTab entityInfo={entityInfo} />}
             {tab === "docs" && <DocsTab role={role} authId={authId} />}
+            {tab === "securite" && role === "admin" && <BreachTab />}
             {tab === "historique" && (
-              <div className="flex flex-col items-center gap-4 py-14 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-sapin/5 border border-dashed border-sapin/20 flex items-center justify-center">
-                  <Clock size={26} className="text-sapin/30" />
-                </div>
-                <div>
-                  <p className="font-bold text-sapin/60">Bientôt disponible</p>
-                  <p className="text-sapin/40 mt-1 max-w-xs">
-                    L'historique de vos activités sera disponible dans une
-                    prochaine version.
-                  </p>
-                </div>
-              </div>
+              <EmptyState
+                icon={<Clock size={32} className="text-sapin/30" />}
+                title="Bientôt disponible"
+                description="L'historique de vos activités sera disponible dans une prochaine version."
+              />
             )}
           </div>
         </div>
