@@ -141,7 +141,7 @@ export default function AdminProfileCard({
           <div className="pt-1 border-t border-sapin/8">
             {docs && docs.length > 0 ? (
               <>
-                <p className="text-[10px] font-bold text-sapin/40 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+                <p className="text-xs font-bold text-sapin uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
                   <FileText size={12} />
                   Documents
                 </p>
@@ -161,7 +161,7 @@ export default function AdminProfileCard({
                 </div>
               </>
             ) : (
-              <p className="text-xs text-sapin/30 italic">Aucun document déposé</p>
+              <p className="text-xs text-sapin italic">Aucun document déposé</p>
             )}
           </div>
         )}
