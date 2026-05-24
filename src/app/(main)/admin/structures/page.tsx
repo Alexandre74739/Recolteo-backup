@@ -98,7 +98,7 @@ export default async function StructuresPage({
   const commercantIds = commercantList.map((c) => c.id_commercant);
   const associationIds = associationList.map((a) => a.id_association);
 
-  const [commercantDocsResult, associationDocsResult] = await Promise.all([
+  const [commercantDocsResult, associationDocsResult, assocCagnotteResult] = await Promise.all([
     commercantIds.length > 0
       ? admin
         .from("document")
@@ -113,6 +113,13 @@ export default async function StructuresPage({
         .eq("type_entity", "association")
         .in("id_entity", associationIds)
       : Promise.resolve({ data: [] as RawDoc[] }),
+    associationIds.length > 0
+      ? admin
+        .from("collect")
+        .select("id_association, lot:id_lot(montant_chiffre)")
+        .eq("statut", true)
+        .in("id_association", associationIds)
+      : Promise.resolve({ data: [] as { id_association: number; lot: { montant_chiffre: number } | null }[] }),
   ]);
 
   const commercantDocMap = new Map<number, RawDoc>(
@@ -122,13 +129,19 @@ export default async function StructuresPage({
     (associationDocsResult.data ?? []).map((d) => [d.id_entity, d as RawDoc]),
   );
 
+  const cagnotteMap = new Map<number, number>();
+  for (const row of (assocCagnotteResult.data ?? [])) {
+    const montant = (row.lot as { montant_chiffre: number } | null)?.montant_chiffre ?? 0;
+    cagnotteMap.set(row.id_association, (cagnotteMap.get(row.id_association) ?? 0) + montant * 0.02);
+  }
+
   const commercants: StructureCommercant[] = (
     commercantList as StructureCommercant[]
   ).map((c) => ({ ...c, docs: buildDocs(commercantDocMap.get(c.id_commercant)) }));
 
   const associations: StructureAssociation[] = (
     associationList as StructureAssociation[]
-  ).map((a) => ({ ...a, docs: buildDocs(associationDocMap.get(a.id_association)) }));
+  ).map((a) => ({ ...a, docs: buildDocs(associationDocMap.get(a.id_association)), cagnotte: cagnotteMap.get(a.id_association) ?? 0 }));
 
   return (
     <main className="relative w-full min-h-[calc(100vh-80px)] overflow-hidden">

@@ -134,6 +134,7 @@ export default function StructuresFiltre({
                     { label: "RNA", value: a.rna },
                     { label: "Type", value: a.type_asso },
                     { label: "Adresse", value: a.adresse },
+                    { label: "Cagnotte", value: a.cagnotte.toLocaleString("fr-FR", { style: "currency", currency: "EUR" }) },
                   ]}
                   createdAt={a.created_at}
                   showActions={false}

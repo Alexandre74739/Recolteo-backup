@@ -28,6 +28,7 @@ export interface StructureAssociation {
   statut_abonnement: boolean;
   created_at: string;
   docs: DocItem[];
+  cagnotte: number;
 }
 
 export interface StructuresFiltreProps {
