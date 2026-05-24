@@ -127,9 +127,6 @@ export default function ReservationModal({
               </p>
             </div>
 
-            <p className="text-xs font-bold text-sapin/50 uppercase tracking-widest mb-3 px-2">
-              Vos codes de retrait
-            </p>
             <div className="flex flex-col gap-3">
               {result.codes.map(
                 ({ id_lot, nature, name_entreprise, adresse_recup, code }) => (
@@ -137,6 +134,9 @@ export default function ReservationModal({
                     key={id_lot}
                     className="border border-sapin/10 rounded-xl p-4"
                   >
+                    <p className="text-xs font-bold text-sapin/50 uppercase tracking-widest mb-1">
+                      Vos codes de retrait
+                    </p>
                     <div className="mb-3">
                       <p className="font-semibold text-sapin text-sm">
                         {nature}
@@ -278,11 +278,10 @@ export default function ReservationModal({
                   type="button"
                   disabled={isPending}
                   onClick={() => setSelectedSlot(slot.value)}
-                  className={`px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
-                    selectedSlot === slot.value
+                  className={`px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all ${selectedSlot === slot.value
                       ? "bg-sapin text-cream border-sapin shadow-[2px_2px_0_0_#04251c]"
                       : "border-sapin/15 text-sapin hover:bg-sapin/6 hover:border-sapin/30"
-                  } disabled:opacity-50`}
+                    } disabled:opacity-50`}
                 >
                   {slot.label}
                 </button>
