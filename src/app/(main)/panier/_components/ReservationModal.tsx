@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import {
   Calendar,
   Clock,
@@ -75,7 +76,6 @@ export default function ReservationModal({
           creneau: res.creneau,
           emailErrors: res.emailErrors,
         });
-        onSuccess();
       } else {
         setError(res.error);
       }
@@ -86,9 +86,9 @@ export default function ReservationModal({
     return (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        onClick={onClose}
+        onClick={onSuccess}
       >
-        <div className="absolute inset-0 bg-white backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-cream/90 backdrop-blur-sm" />
         <div
           className="relative z-10 w-full max-w-lg bg-white rounded-2xl border-2 border-sapin/10 shadow-[8px_8px_0_0_color-mix(in_srgb,var(--color-sapin)_15%,transparent)] overflow-hidden max-h-[90vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
@@ -104,13 +104,13 @@ export default function ReservationModal({
                 </h3>
                 <p className="text-sapin/50 text-xs mt-0.5">
                   {result?.emailErrors?.length
-                    ? "Réservation enregistrée — problème d'envoi email"
+                    ? "Réservation enregistrée : problème d'envoi email"
                     : "Emails de confirmation envoyés aux deux parties"}
                 </p>
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={onSuccess}
               className="p-1 rounded-lg text-sapin/40 hover:text-sapin hover:bg-sapin/6 transition-colors"
             >
               <X size={20} />
@@ -127,9 +127,6 @@ export default function ReservationModal({
               </p>
             </div>
 
-            <p className="text-xs font-bold text-sapin/50 uppercase tracking-widest mb-3">
-              Vos codes de retrait
-            </p>
             <div className="flex flex-col gap-3">
               {result.codes.map(
                 ({ id_lot, nature, name_entreprise, adresse_recup, code }) => (
@@ -137,6 +134,9 @@ export default function ReservationModal({
                     key={id_lot}
                     className="border border-sapin/10 rounded-xl p-4"
                   >
+                    <p className="text-xs font-bold text-sapin/50 uppercase tracking-widest mb-1">
+                      Vos codes de retrait
+                    </p>
                     <div className="mb-3">
                       <p className="font-semibold text-sapin text-sm">
                         {nature}
@@ -169,18 +169,24 @@ export default function ReservationModal({
             </div>
 
             {result.emailErrors?.length ? (
-              <div className="mt-5 bg-peach/8 border border-peach/20 rounded-xl px-4 py-3">
-                <p className="text-xs font-bold text-peach mb-1">
-                  Emails non envoyés
+              <div className="mt-5 bg-sapin/4 border border-sapin/10 rounded-xl px-4 py-3">
+                <p className="text-xs font-bold text-sapin/70 mb-1">
+                  Email de confirmation non reçu ?
                 </p>
-                {result.emailErrors.map((e, i) => (
-                  <p key={i} className="text-xs text-peach/80">
-                    {e}
-                  </p>
-                ))}
+                <p className="text-xs text-sapin/60 leading-relaxed">
+                  Pas d'inquiétude, votre réservation est bien enregistrée
+                  et vos codes de retrait ci-dessus sont valides. Conservez-les
+                  précieusement pour récupérer vos lots.
+                </p>
                 <p className="text-xs text-sapin/50 mt-2">
-                  Vos codes sont affichés ci-dessus — conservez-les pour le
-                  retrait.
+                  Un problème ou une question ?{" "}
+                  <Link
+                    href="/contact"
+                    className="font-semibold text-sapin underline underline-offset-2 hover:text-sapin/70 transition-colors"
+                  >
+                    Contactez un administrateur
+                  </Link>
+                  .
                 </p>
               </div>
             ) : (
@@ -195,7 +201,7 @@ export default function ReservationModal({
           <div className="px-6 pb-5 shrink-0">
             <Button
               label="Fermer"
-              onClick={onClose}
+              onClick={onSuccess}
               variant="sapin"
               showArrow={false}
               className="w-full justify-center"
@@ -211,7 +217,7 @@ export default function ReservationModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={isPending ? undefined : onClose}
     >
-      <div className="absolute inset-0 bg-sapin/40 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm" />
       <div
         className="relative z-10 w-full max-w-md bg-white rounded-2xl border-2 border-sapin/10 shadow-[8px_8px_0_0_color-mix(in_srgb,var(--color-sapin)_15%,transparent)] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -256,7 +262,7 @@ export default function ReservationModal({
               className="w-full border border-sapin/15 rounded-xl px-4 py-3 text-sm text-sapin font-medium focus:outline-none focus:border-sapin/40 focus:ring-2 focus:ring-sapin/10 disabled:opacity-50"
             />
             <p className="text-xs text-sapin/35 mt-1.5">
-              Disponible jusqu&apos;à 14 jours à l&apos;avance
+              Disponible jusqu'à 14 jours à l'avance
             </p>
           </div>
 
@@ -272,11 +278,10 @@ export default function ReservationModal({
                   type="button"
                   disabled={isPending}
                   onClick={() => setSelectedSlot(slot.value)}
-                  className={`px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
-                    selectedSlot === slot.value
+                  className={`px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all ${selectedSlot === slot.value
                       ? "bg-sapin text-cream border-sapin shadow-[2px_2px_0_0_#04251c]"
                       : "border-sapin/15 text-sapin hover:bg-sapin/6 hover:border-sapin/30"
-                  } disabled:opacity-50`}
+                    } disabled:opacity-50`}
                 >
                   {slot.label}
                 </button>

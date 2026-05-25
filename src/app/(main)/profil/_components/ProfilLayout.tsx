@@ -23,7 +23,8 @@ const BASE_TABS = [
 ];
 
 const ADMIN_TABS = [
-  ...BASE_TABS,
+  { value: "info", label: "Informations" },
+  { value: "historique", label: "Historique" },
   { value: "securite", label: "Sécurité" },
 ];
 

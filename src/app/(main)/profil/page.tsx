@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import ProfilDecorations from "./_components/ProfilDecorations";
 import ProfilLayout from "./_components/ProfilLayout";
 
@@ -74,13 +75,33 @@ export default async function ProfilPage() {
   }
 
   if (association) {
+    const admin = createAdminClient();
+    const { data: assocRow } = await admin
+      .from("association")
+      .select("id_association")
+      .eq("id_user", userRow.id_user)
+      .maybeSingle();
+
+    let cagnotte = 0;
+    if (assocRow) {
+      const { data: collects } = await admin
+        .from("collect")
+        .select("lot:id_lot(montant_chiffre)")
+        .eq("id_association", assocRow.id_association)
+        .eq("statut", true);
+      cagnotte = (collects ?? []).reduce(
+        (sum, c) => sum + (((c.lot as unknown as { montant_chiffre: number } | null)?.montant_chiffre ?? 0) * 0.02),
+        0,
+      );
+    }
+
     return (
       <PageShell>
         <ProfilLayout
           nom={association.name_entreprise}
           role="association"
           authId={user.id}
-          entityInfo={{ role: "association", ...association }}
+          entityInfo={{ role: "association", ...association, cagnotte }}
         />
       </PageShell>
     );

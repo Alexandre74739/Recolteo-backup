@@ -1,4 +1,8 @@
+import type { DocType } from "@/src/lib/supabase/documents-types";
+
 export type AdminFilter = "all" | "commercant" | "association";
+
+export type DocItem = { type: DocType; url: string };
 
 export interface Commercant {
   id_commercant: number;

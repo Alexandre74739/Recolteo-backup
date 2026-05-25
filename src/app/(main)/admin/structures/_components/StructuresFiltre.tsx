@@ -3,14 +3,13 @@
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import Reveal from "@/src/components/animations/Reveal";
-import AdminStatsBar from "./AdminStatsBar";
-import AdminProfileCard from "./AdminProfileCard";
-import AdminEmptyState from "./AdminEmptyState";
+import AdminStatsBar from "../../_components/AdminStatsBar";
+import AdminProfileCard from "../../_components/AdminProfileCard";
 import Pagination from "@/src/components/ui/primitives/Pagination";
-import { adminNavigate } from "./adminNavigate";
-import type { AdminFilter, AdminFiltreProps } from "./types";
+import { structuresNavigate } from "./structuresNavigate";
+import type { StructureFilter, StructuresFiltreProps } from "./types";
 
-export default function AdminFiltre({
+export default function StructuresFiltre({
   commercants,
   commercantsTotal,
   associations,
@@ -18,9 +17,7 @@ export default function AdminFiltre({
   filter,
   page,
   pageSize,
-  adminPrenom,
-  adminNom,
-}: AdminFiltreProps) {
+}: StructuresFiltreProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -29,29 +26,16 @@ export default function AdminFiltre({
   const showAssociations = filter !== "commercant" && associations.length > 0;
   const isEmpty = commercants.length === 0 && associations.length === 0;
 
-  const go = (newFilter: AdminFilter, newPage: number) =>
-    adminNavigate(router, pathname, newFilter, newPage);
+  const go = (newFilter: StructureFilter, newPage: number) =>
+    structuresNavigate(router, pathname, newFilter, newPage);
 
   return (
     <div className="flex flex-col gap-10">
       <Reveal delay={0}>
         <div>
-          <h1 className="text-sapin font-black">
-            Bonjour{" "}
-            <span className="relative italic whitespace-nowrap ml-4">
-              <span
-                className="absolute inset-0 bg-lime rounded-xl -rotate-1 scale-x-110"
-                aria-hidden="true"
-              />
-              <span className="relative">
-                {adminPrenom} {adminNom}
-              </span>
-            </span>
-          </h1>
-          <p className="text-sapin mt-8">
-            {total > 0
-              ? `${total} profil${total > 1 ? "s" : ""} en attente de validation.`
-              : "Tout est validé, rien à faire pour l'instant."}
+          <h1 className="text-sapin font-black">Toutes les structures</h1>
+          <p className="text-sapin mt-4">
+            {total} structure{total > 1 ? "s" : ""} inscrite{total > 1 ? "s" : ""}.
           </p>
         </div>
       </Reveal>
@@ -68,7 +52,9 @@ export default function AdminFiltre({
 
       {isEmpty && (
         <Reveal delay={0.2}>
-          <AdminEmptyState />
+          <div className="text-center py-16 text-sapin/40 font-semibold">
+            Aucune structure pour ce filtre.
+          </div>
         </Reveal>
       )}
 
@@ -104,6 +90,9 @@ export default function AdminFiltre({
                     { label: "Adresse", value: c.adresse },
                   ]}
                   createdAt={c.created_at}
+                  showActions={false}
+                  subscriptionActive={c.statut_abonnement}
+                  docs={c.docs}
                 />
               ))}
             </div>
@@ -145,8 +134,12 @@ export default function AdminFiltre({
                     { label: "RNA", value: a.rna },
                     { label: "Type", value: a.type_asso },
                     { label: "Adresse", value: a.adresse },
+                    { label: "Cagnotte", value: a.cagnotte.toLocaleString("fr-FR", { style: "currency", currency: "EUR" }) },
                   ]}
                   createdAt={a.created_at}
+                  showActions={false}
+                  subscriptionActive={a.statut_abonnement}
+                  docs={a.docs}
                 />
               ))}
             </div>

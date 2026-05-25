@@ -17,6 +17,7 @@ type EntityInfo =
       rna: string;
       type_asso: string;
       adresse: string;
+      cagnotte: number;
     }
   | { role: "admin"; nom: string; prenom: string };
 
@@ -72,6 +73,10 @@ export default function InfoTab({ entityInfo }: { entityInfo: EntityInfo | null 
       {common}
       <InfoRow label="RNA" value={entityInfo.rna} />
       <InfoRow label="Type" value={entityInfo.type_asso} />
+      <InfoRow
+        label="Cagnotte"
+        value={entityInfo.cagnotte.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+      />
     </div>
   );
 }

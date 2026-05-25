@@ -41,7 +41,7 @@ export async function validateProfile(formData: FormData) {
       .eq("id_association", id);
   }
 
-  revalidatePath("/admin");
+  revalidatePath("/admin/validation");
 }
 
 export async function rejectProfile(formData: FormData) {
@@ -89,5 +89,5 @@ export async function rejectProfile(formData: FormData) {
     }
   }
 
-  revalidatePath("/admin");
+  revalidatePath("/admin/validation");
 }
