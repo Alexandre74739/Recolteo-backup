@@ -61,7 +61,7 @@ export default function CookieManager() {
             whileHover={{ scale: 1.1 }}
             onClick={() => setPanelOpen(true)}
             aria-label="Gérer mes préférences cookies"
-            className="fixed left-4 bottom-6 z-40 w-12 h-12 rounded-full bg-lime text-sapin border border-sapin shadow-[4px_4px_0_0_#04251c] flex items-center justify-center"
+            className="fixed left-4 bottom-6 z-40  w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-lime text-sapin border border-sapin shadow-[4px_4px_0_0_#04251c] flex items-center justify-center"
           >
             <Cookie size={22} />
           </motion.button>
