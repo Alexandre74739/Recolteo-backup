@@ -70,7 +70,8 @@ export default async function StructuresPage({
         .order("created_at", { ascending: false })
       : admin
         .from("commercant")
-        .select("id_commercant", { count: "exact", head: true }),
+        .select("id_commercant", { count: "exact", head: true })
+        .eq("is_validated", true),
     filter !== "commercant"
       ? admin
         .from("association")
@@ -83,7 +84,8 @@ export default async function StructuresPage({
         .order("created_at", { ascending: false })
       : admin
         .from("association")
-        .select("id_association", { count: "exact", head: true }),
+        .select("id_association", { count: "exact", head: true })
+        .eq("is_validated", true),
   ]);
 
   const commercantList =
