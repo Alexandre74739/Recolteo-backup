@@ -78,7 +78,7 @@ export default async function ProfilPage() {
     const admin = createAdminClient();
     const { data: assocRow } = await admin
       .from("association")
-      .select("id_association")
+      .select("id_association, cagnotte_reset_at")
       .eq("id_user", userRow.id_user)
       .maybeSingle();
 
@@ -86,13 +86,15 @@ export default async function ProfilPage() {
     if (assocRow) {
       const { data: collects } = await admin
         .from("collect")
-        .select("lot:id_lot(montant_chiffre)")
+        .select("code_valide_at, lot:id_lot(montant_chiffre)")
         .eq("id_association", assocRow.id_association)
         .eq("statut", true);
-      cagnotte = (collects ?? []).reduce(
-        (sum, c) => sum + (((c.lot as unknown as { montant_chiffre: number } | null)?.montant_chiffre ?? 0) * 0.02),
-        0,
-      );
+      const resetAt = assocRow.cagnotte_reset_at;
+      cagnotte = (collects ?? []).reduce((sum, c) => {
+        const validatedAt = (c as { code_valide_at?: string | null }).code_valide_at ?? null;
+        if (resetAt && validatedAt && validatedAt <= resetAt) return sum;
+        return sum + (((c.lot as unknown as { montant_chiffre: number } | null)?.montant_chiffre ?? 0) * 0.02);
+      }, 0);
     }
 
     return (

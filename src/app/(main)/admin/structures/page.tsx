@@ -75,7 +75,7 @@ export default async function StructuresPage({
       ? admin
         .from("association")
         .select(
-          "id_association, name_entreprise, email, tel, type_asso, adresse, rna, statut_abonnement, created_at",
+          "id_association, name_entreprise, email, tel, type_asso, adresse, rna, statut_abonnement, created_at, cagnotte_reset_at",
           { count: "exact" },
         )
         .eq("is_validated", true)
@@ -116,10 +116,10 @@ export default async function StructuresPage({
     associationIds.length > 0
       ? admin
         .from("collect")
-        .select("id_association, lot:id_lot(montant_chiffre)")
+        .select("id_association, code_valide_at, lot:id_lot(montant_chiffre)")
         .eq("statut", true)
         .in("id_association", associationIds)
-      : Promise.resolve({ data: [] as { id_association: number; lot: { montant_chiffre: number } | null }[] }),
+      : Promise.resolve({ data: [] as { id_association: number; code_valide_at: string | null; lot: { montant_chiffre: number } | null }[] }),
   ]);
 
   const commercantDocMap = new Map<number, RawDoc>(
@@ -129,8 +129,15 @@ export default async function StructuresPage({
     (associationDocsResult.data ?? []).map((d) => [d.id_entity, d as RawDoc]),
   );
 
+  const resetAtMap = new Map<number, string | null>(
+    associationList.map((a) => [a.id_association, (a as { cagnotte_reset_at?: string | null }).cagnotte_reset_at ?? null]),
+  );
+
   const cagnotteMap = new Map<number, number>();
   for (const row of (assocCagnotteResult.data ?? [])) {
+    const resetAt = resetAtMap.get(row.id_association) ?? null;
+    const validatedAt = (row as { code_valide_at?: string | null }).code_valide_at ?? null;
+    if (resetAt && validatedAt && validatedAt <= resetAt) continue;
     const montant = (row.lot as { montant_chiffre: number } | null)?.montant_chiffre ?? 0;
     cagnotteMap.set(row.id_association, (cagnotteMap.get(row.id_association) ?? 0) + montant * 0.02);
   }
@@ -141,7 +148,11 @@ export default async function StructuresPage({
 
   const associations: StructureAssociation[] = (
     associationList as StructureAssociation[]
-  ).map((a) => ({ ...a, docs: buildDocs(associationDocMap.get(a.id_association)), cagnotte: cagnotteMap.get(a.id_association) ?? 0 }));
+  ).map((a) => ({
+    ...a,
+    docs: buildDocs(associationDocMap.get(a.id_association)),
+    cagnotte: cagnotteMap.get(a.id_association) ?? 0,
+  }));
 
   return (
     <main className="relative w-full min-h-[calc(100vh-80px)] overflow-hidden">

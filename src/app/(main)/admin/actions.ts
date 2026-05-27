@@ -5,6 +5,17 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 
+export async function resetCagnotte(formData: FormData) {
+  await assertAdmin();
+  const id = parseInt(formData.get("id") as string, 10);
+  const admin = createAdminClient();
+  await admin
+    .from("association")
+    .update({ cagnotte_reset_at: new Date().toISOString() })
+    .eq("id_association", id);
+  revalidatePath("/admin/structures");
+}
+
 async function assertAdmin() {
   const supabase = await createClient();
   const {
