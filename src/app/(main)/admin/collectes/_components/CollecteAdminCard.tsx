@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Mail, Phone, MapPin, ShoppingBag, Users } from "@deemlol/next-icons";
+import { Mail, Phone, MapPin, ShoppingBag, Users, X } from "@deemlol/next-icons";
 import Button from "@/src/components/ui/primitives/Button";
 import { validerCollectAdmin, type CollectAdminItem } from "../../actions";
 
 interface Props {
   item: CollectAdminItem;
   onValidated: () => void;
+  onClose?: () => void;
 }
 
-export default function CollecteAdminCard({ item, onValidated }: Props) {
+export default function CollecteAdminCard({ item, onValidated, onClose }: Props) {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -56,6 +57,15 @@ export default function CollecteAdminCard({ item, onValidated }: Props) {
             })}
           </time>
         </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl border-2 border-sapin/15 text-sapin/50 hover:border-sapin/40 hover:text-sapin hover:bg-sapin/10 transition-all duration-200"
+            aria-label="Fermer"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-sapin/8">
@@ -144,15 +154,18 @@ export default function CollecteAdminCard({ item, onValidated }: Props) {
         </div>
       </div>
 
-      <dl className="px-5 py-4 border-t border-sapin/8 bg-lime/5">
-        <dt className="text-[10px] font-bold text-sapin/60 uppercase tracking-widest mb-1">
-          Code de retrait (visible admin)
-        </dt>
-        <dd className="text-2xl font-black tracking-[0.4em] text-sapin">
-          {item.code_retrait}
-        </dd>
-      </dl>
+      {!onClose && (
+        <dl className="px-5 py-4 border-t border-sapin/8 bg-lime/5">
+          <dt className="text-[10px] font-bold text-sapin/60 uppercase tracking-widest mb-1">
+            Code de retrait (visible admin)
+          </dt>
+          <dd className="text-2xl font-black tracking-[0.4em] text-sapin">
+            {item.code_retrait}
+          </dd>
+        </dl>
+      )}
 
+      {!onClose && (
       <form
         onSubmit={handleSubmit}
         className="p-5 border-t border-sapin/8 flex flex-col gap-3"
@@ -194,6 +207,7 @@ export default function CollecteAdminCard({ item, onValidated }: Props) {
           className="w-full justify-center"
         />
       </form>
+      )}
     </article>
   );
 }

@@ -195,6 +195,7 @@ export async function rejectProfile(formData: FormData) {
 
 export type CollectAdminItem = {
   id_collect: number;
+  statut: boolean;
   code_retrait: string;
   creneau: string;
   lot: {
@@ -261,16 +262,78 @@ export async function getPendingCollects(): Promise<CollectAdminItem[]> {
     const lot = lotMap.get(c.id_lot) ?? null;
     return {
       id_collect: c.id_collect,
+      statut: false,
       id_lot: c.id_lot,
       code_retrait: c.code_retrait ?? "",
       creneau: c.creneau ?? "",
       lot: lot
         ? {
-            nature: lot.nature,
-            quantity: lot.quantity,
-            montant_chiffre: lot.montant_chiffre,
-            adresse_recup: lot.adresse_recup,
-          }
+          nature: lot.nature,
+          quantity: lot.quantity,
+          montant_chiffre: lot.montant_chiffre,
+          adresse_recup: lot.adresse_recup,
+        }
+        : null,
+      commercant: lot ? (commercantMap.get(lot.id_commercant) ?? null) : null,
+      association: assocMap.get(c.id_association) ?? null,
+    };
+  });
+}
+
+export async function getAllCollectsAdmin(): Promise<CollectAdminItem[]> {
+  await assertAdmin();
+  const admin = createAdminClient();
+
+  const { data: collects } = await admin
+    .from("collect")
+    .select("id_collect, id_lot, id_association, code_retrait, creneau, statut")
+    .order("creneau", { ascending: false });
+
+  if (!collects?.length) return [];
+
+  const lotIds = [...new Set(collects.map((c) => c.id_lot))];
+  const assocIds = [...new Set(collects.map((c) => c.id_association))];
+
+  const { data: lots } = await admin
+    .from("lot")
+    .select("id_lot, id_commercant, nature, quantity, montant_chiffre, adresse_recup")
+    .in("id_lot", lotIds);
+
+  const commercantIds = [...new Set((lots ?? []).map((l) => l.id_commercant))];
+
+  const [{ data: associations }, { data: commercants }] = await Promise.all([
+    admin
+      .from("association")
+      .select("id_association, name_entreprise, email, tel, rna, adresse")
+      .in("id_association", assocIds),
+    admin
+      .from("commercant")
+      .select("id_commercant, name_entreprise, email, adresse")
+      .in("id_commercant", commercantIds),
+  ]);
+
+  const lotMap = new Map((lots ?? []).map((l) => [l.id_lot, l]));
+  const assocMap = new Map(
+    (associations ?? []).map((a) => [a.id_association, a]),
+  );
+  const commercantMap = new Map(
+    (commercants ?? []).map((c) => [c.id_commercant, c]),
+  );
+
+  return collects.map((c) => {
+    const lot = lotMap.get(c.id_lot) ?? null;
+    return {
+      id_collect: c.id_collect,
+      statut: c.statut ?? false,
+      code_retrait: c.code_retrait ?? "",
+      creneau: c.creneau ?? "",
+      lot: lot
+        ? {
+          nature: lot.nature,
+          quantity: lot.quantity,
+          montant_chiffre: lot.montant_chiffre,
+          adresse_recup: lot.adresse_recup,
+        }
         : null,
       commercant: lot ? (commercantMap.get(lot.id_commercant) ?? null) : null,
       association: assocMap.get(c.id_association) ?? null,
@@ -450,18 +513,18 @@ export async function validerCollectAdmin(
         </div>`,
       ...(pdfBuffer
         ? {
-            attachments: [
-              { filename: `cerfa_${numeroSequentiel}.pdf`, content: pdfBuffer },
-            ],
-          }
+          attachments: [
+            { filename: `cerfa_${numeroSequentiel}.pdf`, content: pdfBuffer },
+          ],
+        }
         : {}),
     }),
     association.email
       ? resend.emails.send({
-          from: "Récoltéo <onboarding@resend.dev>",
-          to: association.email,
-          subject: `Collecte confirmée par ${commercant.name_entreprise} — Récoltéo`,
-          html: `
+        from: "Récoltéo <onboarding@resend.dev>",
+        to: association.email,
+        subject: `Collecte confirmée par ${commercant.name_entreprise} — Récoltéo`,
+        html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
               <div style="background:#06573f;padding:24px;border-radius:12px 12px 0 0;">
                 <h1 style="color:#c9f242;margin:0;font-size:24px;">Collecte confirmée</h1>
@@ -474,7 +537,7 @@ export async function validerCollectAdmin(
                 <p style="margin-top:24px;color:#374151;">L'équipe <strong>Récoltéo</strong></p>
               </div>
             </div>`,
-        })
+      })
       : Promise.resolve(),
   ]);
 
