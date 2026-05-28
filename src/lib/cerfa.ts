@@ -46,7 +46,7 @@ async function getCommuneFromPostalCode(codePostal: string): Promise<string> {
   if (!/^\d{5}$/.test(codePostal)) return "";
   try {
     const res = await fetch(
-      `https://geo.api.gouv.fr/communes?codePostal=${codePostal}&fields=nom&format=json`,
+      `${process.env.GEO_API_COMMUNES_URL}?codePostal=${codePostal}&fields=nom&format=json`,
     );
     if (!res.ok) return "";
     const data: { nom: string }[] = await res.json();

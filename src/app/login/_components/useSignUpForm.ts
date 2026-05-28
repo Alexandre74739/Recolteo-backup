@@ -150,7 +150,7 @@ export function useSignUpForm() {
     }
     try {
       const res = await fetch(
-        `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5&type=housenumber`,
+        `${process.env.NEXT_PUBLIC_BAN_GEOCODE_URL}?q=${encodeURIComponent(query)}&limit=5&type=housenumber`,
       );
       const data: {
         features: {
