@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Clock, UserX, Shield } from "@deemlol/next-icons";
-import EmptyState from "@/src/components/ui/primitives/EmptyState";
+import { UserX, Shield } from "@deemlol/next-icons";
 import { signOut } from "@/src/app/login/actions";
 import Button from "@/src/components/ui/primitives/Button";
 import TabToggle from "@/src/components/ui/primitives/TabToggle";
@@ -15,6 +14,7 @@ import BreachTab from "./BreachTab";
 import CollectesTab from "./CollectesTab";
 import HistoriqueCommercantTab from "./HistoriqueCommercantTab";
 import HistoriqueAssociationTab from "./HistoriqueAssociationTab";
+import HistoriqueAdminTab from "./HistoriqueAdminTab";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 
 type Tab = "info" | "docs" | "collectes" | "historique" | "securite";
@@ -71,7 +71,7 @@ export default function ProfilLayout({
       </Reveal>
 
       <Reveal delay={0.08}>
-        <p className="text-sapin/65 leading-relaxed">{ROLE_SUBTITLE[role]}</p>
+        <p className={`leading-relaxed ${role === "admin" ? "text-sapin font-semibold" : "text-sapin/65"}`}>{ROLE_SUBTITLE[role]}</p>
       </Reveal>
 
       <Reveal delay={0.16}>
@@ -100,11 +100,7 @@ export default function ProfilLayout({
               <HistoriqueAssociationTab />
             )}
             {tab === "historique" && role === "admin" && (
-              <EmptyState
-                icon={<Clock size={32} className="text-sapin/30" />}
-                title="Bientôt disponible"
-                description="L'historique de vos activités sera disponible dans une prochaine version."
-              />
+              <HistoriqueAdminTab />
             )}
           </div>
         </div>

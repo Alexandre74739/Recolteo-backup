@@ -123,6 +123,7 @@ export async function signUp(
       siret,
       name_entreprise: nameEntreprise,
       adresse: (formData.get("adresse") as string).trim().slice(0, 300),
+      code_postal: (formData.get("code_postal") as string).trim().slice(0, 10) || null,
       type_activity: (formData.get("type_activity") as string).trim().slice(0, 100),
       forme_juridique: (formData.get("forme_juridique") as string).trim().slice(0, 100),
       is_validated: false,
@@ -148,6 +149,7 @@ export async function signUp(
         rna,
         name_entreprise: nameEntreprise,
         adresse: assoAdresse,
+        code_postal: (formData.get("code_postal") as string).trim().slice(0, 10) || null,
         type_asso: (formData.get("type_asso") as string).trim().slice(0, 100),
         is_validated: false,
       })

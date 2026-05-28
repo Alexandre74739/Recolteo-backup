@@ -8,6 +8,7 @@ type EntityInfo =
       type_activity: string;
       forme_juridique: string;
       adresse: string;
+      code_postal: string | null;
     }
   | {
       role: "association";
@@ -17,6 +18,7 @@ type EntityInfo =
       rna: string;
       type_asso: string;
       adresse: string;
+      code_postal: string | null;
       cagnotte: number;
     }
   | { role: "admin"; nom: string; prenom: string };
@@ -48,11 +50,18 @@ export default function InfoTab({ entityInfo }: { entityInfo: EntityInfo | null 
       </div>
     );
 
+  const adresseComplete = [
+    entityInfo.adresse,
+    entityInfo.code_postal,
+  ]
+    .filter(Boolean)
+    .join(" — ");
+
   const common = (
     <>
       <InfoRow label="Email" value={entityInfo.email} />
       <InfoRow label="Téléphone" value={entityInfo.tel} />
-      <InfoRow label="Adresse" value={entityInfo.adresse} />
+      <InfoRow label="Adresse" value={adresseComplete} />
     </>
   );
 

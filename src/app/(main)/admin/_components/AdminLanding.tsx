@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, Users } from "@deemlol/next-icons";
+import { Clock, Users, CheckSquare } from "@deemlol/next-icons";
 import Reveal from "@/src/components/animations/Reveal";
 
 interface AdminLandingProps {
@@ -9,6 +9,7 @@ interface AdminLandingProps {
   adminNom: string;
   pendingTotal: number;
   totalStructures: number;
+  pendingCollects: number;
 }
 
 export default function AdminLanding({
@@ -16,6 +17,7 @@ export default function AdminLanding({
   adminNom,
   pendingTotal,
   totalStructures,
+  pendingCollects,
 }: AdminLandingProps) {
   return (
     <div className="flex flex-col gap-12">
@@ -74,6 +76,26 @@ export default function AdminLanding({
               </span>
             </div>
           </Link>
+
+          <Link href="/admin/collectes" className="group block">
+            <div className="flex items-start gap-5 bg-lime/5 border border-sapin rounded-2xl shadow-[4px_4px_0_0_#06573F] px-6 py-5 transition-all duration-200 group-hover:-translate-y-1">
+              <div className="w-10 h-10 bg-lime border border-sapin rounded-xl shadow-[2px_2px_0_0_#06573F] flex items-center justify-center shrink-0 text-sapin mt-0.5">
+                <CheckSquare size={20} />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-sapin font-bold text-base mb-1">Collectes en attente</h2>
+                <p className="text-sapin/60 text-sm leading-relaxed">
+                  Valider une collecte au nom du commerçant ou de l'association
+                </p>
+              </div>
+              {pendingCollects > 0 && (
+                <span className="px-2.5 py-0.5 bg-peach text-cream text-sm font-bold rounded-full shrink-0 self-center">
+                  {pendingCollects}
+                </span>
+              )}
+            </div>
+          </Link>
+
         </div>
       </Reveal>
     </div>

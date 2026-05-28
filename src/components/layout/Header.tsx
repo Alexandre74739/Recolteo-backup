@@ -9,6 +9,7 @@ import { useCart } from "@/src/lib/cart-context";
 const adminSubLinks = [
   { label: "Validations", href: "/admin/validation" },
   { label: "Structures", href: "/admin/structures" },
+  { label: "Collectes", href: "/admin/collectes" },
 ];
 
 type UserInfo = {

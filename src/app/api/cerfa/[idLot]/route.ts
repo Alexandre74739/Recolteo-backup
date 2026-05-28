@@ -29,7 +29,7 @@ export async function GET(
 
   const { data: commercant } = await admin
     .from("commercant")
-    .select("id_commercant, name_entreprise, forme_juridique, siret, adresse")
+    .select("id_commercant, name_entreprise, forme_juridique, siret, adresse, code_postal")
     .eq("id_user", userRow.id_user)
     .maybeSingle();
   if (!commercant)
@@ -54,7 +54,7 @@ export async function GET(
 
   const { data: association } = await admin
     .from("association")
-    .select("name_entreprise, rna, adresse")
+    .select("name_entreprise, rna, adresse, code_postal")
     .eq("id_association", collect.id_association)
     .maybeSingle();
   if (!association)
@@ -93,12 +93,14 @@ export async function GET(
       name_entreprise: association.name_entreprise,
       rna: association.rna ?? "",
       adresse: association.adresse ?? "",
+      code_postal: association.code_postal ?? "",
     },
     commercant: {
       name_entreprise: commercant.name_entreprise,
       forme_juridique: commercant.forme_juridique ?? "",
       siret: commercant.siret ?? "",
       adresse: commercant.adresse ?? "",
+      code_postal: commercant.code_postal ?? "",
     },
     lot: {
       nature: lot.nature,
