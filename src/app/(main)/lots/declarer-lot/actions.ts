@@ -120,6 +120,12 @@ export async function declarerLot(
   const category = categorySelect === "autre" ? categoryCustom : categorySelect;
 
   const adresse_recup = (formData.get("adresse_recup") as string).trim();
+
+  const quantityRaw = parseFloat(formData.get("quantity") as string);
+  const montantRaw = parseFloat(formData.get("montant_chiffre") as string);
+  if (isNaN(quantityRaw) || quantityRaw <= 0) return { error: "Quantité invalide." };
+  if (isNaN(montantRaw) || montantRaw < 0) return { error: "Montant invalide." };
+
   const admin = createAdminClient();
   const { data: inserted, error } = await admin
     .from("lot")
@@ -132,9 +138,9 @@ export async function declarerLot(
         ((formData.get("instructions") as string) || "").trim() || null,
       category,
       nature: (formData.get("nature") as string).trim(),
-      quantity: parseFloat(formData.get("quantity") as string),
+      quantity: quantityRaw,
       dlc: (formData.get("DLC") as string) || null,
-      montant_chiffre: parseFloat(formData.get("montant_chiffre") as string),
+      montant_chiffre: montantRaw,
       montant_lettre: (formData.get("montant_lettre") as string).trim(),
       statut: true,
     })

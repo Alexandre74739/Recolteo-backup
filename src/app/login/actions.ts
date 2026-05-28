@@ -133,8 +133,7 @@ export async function signUp(
       await admin.auth.admin.deleteUser(authId);
       await admin.from("user").delete().eq("id_user", idUser);
       if (comError.code === "23505") {
-        if (comError.message.includes("tel")) return { error: "Ce numéro de téléphone est déjà associé à un compte." };
-        if (comError.message.includes("siret")) return { error: "Ce numéro SIRET est déjà associé à un compte." };
+        return { error: "Un compte avec ces informations existe déjà." };
       }
       return { error: "Erreur lors de la création du profil. Réessayez." };
     }
@@ -160,8 +159,7 @@ export async function signUp(
       await admin.auth.admin.deleteUser(authId);
       await admin.from("user").delete().eq("id_user", idUser);
       if (assoError?.code === "23505") {
-        if (assoError.message.includes("tel")) return { error: "Ce numéro de téléphone est déjà associé à un compte." };
-        if (assoError.message.includes("rna")) return { error: "Ce numéro RNA est déjà associé à un compte." };
+        return { error: "Un compte avec ces informations existe déjà." };
       }
       return { error: "Erreur lors de la création du profil. Réessayez." };
     }
