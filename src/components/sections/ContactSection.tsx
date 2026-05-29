@@ -1,6 +1,8 @@
 import Reveal from "../animations/Reveal";
 import ContactForm from "./ContactForm";
 import ContactDecorations from "../illustrations/ContactDecorations";
+import Image from "next/image";
+import Ecureuil from "@/src/asset/ecureuil.webp";
 
 interface ContactSectionProps {
   title: string;
