@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import Reveal from "@/src/components/animations/Reveal";
 import AdminStatsBar from "../../_components/AdminStatsBar";
 import AdminProfileCard from "../../_components/AdminProfileCard";
 import Pagination from "@/src/components/ui/primitives/Pagination";
+import Button from "@/src/components/ui/primitives/Button";
+import ConfirmResetCagnotteModal from "@/src/components/ui/modals/ConfirmResetCagnotteModal";
 import { structuresNavigate } from "./structuresNavigate";
+import { resetCagnotte } from "../../actions";
 import type { StructureFilter, StructuresFiltreProps } from "./types";
 
 export default function StructuresFiltre({
@@ -20,6 +24,7 @@ export default function StructuresFiltre({
 }: StructuresFiltreProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [resetTarget, setResetTarget] = useState<{ id: number; name: string } | null>(null);
 
   const total = commercantsTotal + associationsTotal;
   const showCommercants = filter !== "association" && commercants.length > 0;
@@ -28,6 +33,14 @@ export default function StructuresFiltre({
 
   const go = (newFilter: StructureFilter, newPage: number) =>
     structuresNavigate(router, pathname, newFilter, newPage);
+
+  const handleConfirmReset = async () => {
+    if (!resetTarget) return;
+    const fd = new FormData();
+    fd.set("id", String(resetTarget.id));
+    await resetCagnotte(fd);
+    setResetTarget(null);
+  };
 
   return (
     <div className="flex flex-col gap-10">
@@ -140,6 +153,16 @@ export default function StructuresFiltre({
                   showActions={false}
                   subscriptionActive={a.statut_abonnement}
                   docs={a.docs}
+                  extraFooter={
+                    <Button
+                      label="Réinitialiser la cagnotte"
+                      onClick={() => setResetTarget({ id: a.id_association, name: a.name_entreprise })}
+                      variant="peach-outline"
+                      size="sm"
+                      showArrow={false}
+                      className="w-full justify-center"
+                    />
+                  }
                 />
               ))}
             </div>
@@ -168,6 +191,14 @@ export default function StructuresFiltre({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {resetTarget && (
+        <ConfirmResetCagnotteModal
+          associationName={resetTarget.name}
+          onConfirm={handleConfirmReset}
+          onCancel={() => setResetTarget(null)}
+        />
+      )}
     </div>
   );
 }

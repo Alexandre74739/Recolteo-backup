@@ -20,6 +20,7 @@ interface AdminProfileCardProps {
   isValidated?: boolean;
   subscriptionActive?: boolean;
   docs?: DocItem[];
+  extraFooter?: React.ReactNode;
 }
 
 export default function AdminProfileCard({
@@ -34,6 +35,7 @@ export default function AdminProfileCard({
   isValidated,
   subscriptionActive,
   docs,
+  extraFooter,
 }: AdminProfileCardProps) {
   const isCommercant = type === "commercant";
   const date = new Date(createdAt).toLocaleDateString("fr-FR", {
@@ -138,10 +140,10 @@ export default function AdminProfileCard({
             </form>
           </div>
         ) : (
-          <div className="pt-1 border-t border-sapin/8">
+          <div className="pt-1 border-t border-sapin/8 flex flex-col gap-3">
             {docs && docs.length > 0 ? (
               <>
-                <p className="text-xs font-bold text-sapin uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+                <p className="text-xs font-bold text-sapin uppercase tracking-widest flex items-center gap-1.5">
                   <FileText size={12} />
                   Documents
                 </p>
@@ -163,6 +165,7 @@ export default function AdminProfileCard({
             ) : (
               <p className="text-xs text-sapin italic">Aucun document déposé</p>
             )}
+            {extraFooter}
           </div>
         )}
       </div>

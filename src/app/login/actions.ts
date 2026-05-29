@@ -123,6 +123,7 @@ export async function signUp(
       siret,
       name_entreprise: nameEntreprise,
       adresse: (formData.get("adresse") as string).trim().slice(0, 300),
+      code_postal: (formData.get("code_postal") as string).trim().slice(0, 10) || null,
       type_activity: (formData.get("type_activity") as string).trim().slice(0, 100),
       forme_juridique: (formData.get("forme_juridique") as string).trim().slice(0, 100),
       is_validated: false,
@@ -132,8 +133,7 @@ export async function signUp(
       await admin.auth.admin.deleteUser(authId);
       await admin.from("user").delete().eq("id_user", idUser);
       if (comError.code === "23505") {
-        if (comError.message.includes("tel")) return { error: "Ce numéro de téléphone est déjà associé à un compte." };
-        if (comError.message.includes("siret")) return { error: "Ce numéro SIRET est déjà associé à un compte." };
+        return { error: "Un compte avec ces informations existe déjà." };
       }
       return { error: "Erreur lors de la création du profil. Réessayez." };
     }
@@ -148,6 +148,7 @@ export async function signUp(
         rna,
         name_entreprise: nameEntreprise,
         adresse: assoAdresse,
+        code_postal: (formData.get("code_postal") as string).trim().slice(0, 10) || null,
         type_asso: (formData.get("type_asso") as string).trim().slice(0, 100),
         is_validated: false,
       })
@@ -158,8 +159,7 @@ export async function signUp(
       await admin.auth.admin.deleteUser(authId);
       await admin.from("user").delete().eq("id_user", idUser);
       if (assoError?.code === "23505") {
-        if (assoError.message.includes("tel")) return { error: "Ce numéro de téléphone est déjà associé à un compte." };
-        if (assoError.message.includes("rna")) return { error: "Ce numéro RNA est déjà associé à un compte." };
+        return { error: "Un compte avec ces informations existe déjà." };
       }
       return { error: "Erreur lors de la création du profil. Réessayez." };
     }

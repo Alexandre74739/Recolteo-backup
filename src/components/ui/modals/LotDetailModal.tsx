@@ -116,7 +116,7 @@ export default function LotDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 sm:pt-20"
       onClick={onClose}
     >
       <div
@@ -125,7 +125,7 @@ export default function LotDetailModal({
       />
 
       <div
-        className="relative z-10 w-full sm:max-w-md bg-cream rounded-t-3xl sm:rounded-2xl border-2 border-sapin/10 shadow-[0_-4px_32px_0_color-mix(in_srgb,var(--color-sapin)_20%,transparent)] sm:shadow-[8px_8px_0_0_color-mix(in_srgb,var(--color-sapin)_15%,transparent)] overflow-hidden max-h-[92dvh] flex flex-col"
+        className="relative z-10 w-full sm:max-w-md bg-cream rounded-t-3xl sm:rounded-2xl border-2 border-sapin/10 shadow-[0_-4px_32px_0_color-mix(in_srgb,var(--color-sapin)_20%,transparent)] sm:shadow-[8px_8px_0_0_color-mix(in_srgb,var(--color-sapin)_15%,transparent)] overflow-hidden max-h-[80dvh] flex flex-col"
         style={{
           transform: `translateY(${dragY}px)`,
           transition: isDragging

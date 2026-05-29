@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@deemlol/next-icons": "^0.2.7",
-    "@react-pdf/renderer": "^4.5.1",
-    "@supabase/ssr": "^0.10.3",
+"@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "motion": "^12.38.0",
     "next": "^16.2.6",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.12.3",

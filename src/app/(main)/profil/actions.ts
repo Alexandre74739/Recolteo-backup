@@ -53,7 +53,7 @@ async function resolveCommercant() {
   const { data: commercant } = await admin
     .from("commercant")
     .select(
-      "id_commercant, name_entreprise, email, siret, forme_juridique, adresse",
+      "id_commercant, name_entreprise, email, siret, forme_juridique, adresse, code_postal",
     )
     .eq("id_user", userRow.id_user)
     .maybeSingle();
@@ -103,15 +103,42 @@ export async function getCommercantCollects(): Promise<CollectItem[]> {
 
   const lotIds = lots.map((l) => l.id_lot);
 
-  const { data: collects } = await admin
-    .from("collect")
-    .select(
-      `id_lot, statut, date, creneau, lot:id_lot(${LOT_FIELDS}), association:id_association(name_entreprise)`,
-    )
-    .in("id_lot", lotIds)
-    .order("date", { ascending: false });
+  type RawCollect = {
+    id_lot: number;
+    id_association: number;
+    statut: boolean;
+    date: string;
+    creneau: string;
+    lot: CollectLot | null;
+  };
 
-  return (collects ?? []) as unknown as CollectItem[];
+  const { data: collects } = (await admin
+    .from("collect")
+    .select(`id_lot, id_association, statut, date, creneau, lot:id_lot(${LOT_FIELDS})`)
+    .in("id_lot", lotIds)
+    .order("date", { ascending: false })) as unknown as { data: RawCollect[] | null };
+
+  if (!collects?.length) return [];
+
+  const assocIds = [...new Set(collects.map((c) => c.id_association).filter(Boolean))];
+  const { data: associations } = await admin
+    .from("association")
+    .select("id_association, name_entreprise")
+    .in("id_association", assocIds);
+
+  const assocMap = new Map((associations ?? []).map((a) => [a.id_association, a]));
+
+  return collects.map((c) => ({
+    id_lot: c.id_lot,
+    statut: c.statut,
+    date: c.date,
+    creneau: c.creneau,
+    code_retrait: null,
+    lot: c.lot ?? null,
+    association: assocMap.get(c.id_association)
+      ? { name_entreprise: assocMap.get(c.id_association)!.name_entreprise }
+      : null,
+  }));
 }
 
 export async function getAssociationCollects(): Promise<CollectItem[]> {
@@ -186,7 +213,7 @@ export async function validerCollect(
 
   const { data: association } = await admin
     .from("association")
-    .select("name_entreprise, rna, adresse, email")
+    .select("name_entreprise, rna, adresse, code_postal, email")
     .eq("id_association", collect.id_association)
     .maybeSingle();
   if (!association)
@@ -225,12 +252,14 @@ export async function validerCollect(
         name_entreprise: association.name_entreprise,
         rna: association.rna ?? "",
         adresse: association.adresse ?? "",
+        code_postal: association.code_postal ?? "",
       },
       commercant: {
         name_entreprise: commercant.name_entreprise,
         forme_juridique: commercant.forme_juridique ?? "",
         siret: commercant.siret ?? "",
         adresse: commercant.adresse ?? "",
+        code_postal: commercant.code_postal ?? "",
       },
       lot: {
         nature: lot.nature,

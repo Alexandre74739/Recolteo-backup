@@ -5,10 +5,13 @@ import Link from "next/link";
 import { Menu, X, ShoppingBag } from "@deemlol/next-icons";
 import Btn from "../ui/primitives/Button";
 import { useCart } from "@/src/lib/cart-context";
+import Image from "next/image";
+import Logo from "@/src/asset/logo.webp";
 
 const adminSubLinks = [
   { label: "Validations", href: "/admin/validation" },
   { label: "Structures", href: "/admin/structures" },
+  { label: "Collectes", href: "/admin/collectes" },
 ];
 
 type UserInfo = {
@@ -51,6 +54,13 @@ export default function Header({ user }: HeaderProps) {
             href="/"
             className="font-bold text-2xl text-sapin tracking-tight hover:opacity-80 transition-opacity shrink-0"
           >
+            <Image
+              src={Logo}
+              alt="Logo Récoltéo"
+              width={32}
+              height={32}
+              className="inline-block mr-1"
+            />
             Récoltéo
           </Link>
 
