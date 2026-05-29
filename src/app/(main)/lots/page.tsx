@@ -12,6 +12,24 @@ import Leo from "@/src/components/ui/modals/Leo";
 const LOT_FIELDS =
   "id_lot, name_entreprise, adresse, adresse_recup, instructions, category, nature, quantity, dlc, montant_chiffre, montant_lettre, created_at, lat, lng";
 
+const LEO_STEPS_COMMERCANT = [
+  { message: "Bienvenue sur votre espace lots ! Déclarez ici vos invendus du jour en quelques clics pour les mettre à disposition des associations partenaires." },
+  { message: "Pensez à renseigner la date limite de consommation et les instructions de récupération pour faciliter la vie des associations." },
+  { message: "Une fois votre lot publié, les associations de votre secteur sont notifiées et peuvent le réserver directement depuis la plateforme." },
+];
+
+const LEO_STEPS_ADMIN = [
+  { message: "Bienvenue sur la vue administrateur. Vous avez accès à l'ensemble des lots actifs déposés par tous les commerçants de la plateforme." },
+  { message: "Vous pouvez modifier ou supprimer n'importe quel lot, et déclarer des lots au nom d'un commerçant si nécessaire." },
+  { message: "Gardez un œil sur les lots proches de leur DLC pour anticiper les situations d'urgence et contacter les commerçants concernés." },
+];
+
+const LEO_STEPS_ASSOCIATION = [
+  { message: "Bienvenue sur le catalogue des lots disponibles ! Parcourez les invendus mis à disposition par les commerçants partenaires près de chez vous." },
+  { message: "Utilisez les filtres de proximité et de date pour trouver rapidement les lots qui correspondent aux besoins de votre association." },
+  { message: "Une fois votre panier constitué, finalisez votre réservation et convenez des modalités de récupération directement avec le commerçant." },
+];
+
 export default async function LotPage() {
   const supabase = await createClient();
   const {
@@ -47,10 +65,7 @@ export default async function LotPage() {
       .eq("statut", true)
       .eq("id_commercant", commercantResult.data!.id_commercant)
       .order("created_at", { ascending: false });
-    const LEO_STEPS = [
-      { message: "Bienvenue dans votre espace de gestion des lots. Ici, vous pouvez déclarer vos invendus et les mettre à disposition des associations partenaires." },
-      { message: "Chaque lot que vous déclarez est une opportunité de lutter contre le gaspillage et de soutenir votre communauté locale." },
-    ]
+
     return (
       <main>
         <Hero
@@ -66,7 +81,7 @@ export default async function LotPage() {
           secondaryButtonHref="/profil"
         />
         <GestionLots lots={(lotsData ?? []) as Lot[]} />
-        <Leo storageKey="leo-lots" steps={LEO_STEPS} />
+        <Leo storageKey="leo-lots-commercant" steps={LEO_STEPS_COMMERCANT} />
       </main>
     );
   }
@@ -105,10 +120,6 @@ export default async function LotPage() {
   }
 
   if (isAdmin) {
-    const LEO_STEPS = [
-    { message: "Explorez les lots mis à disposition par nos commerçants partenaires et réservez ceux dont votre association a besoin." },
-    { message: "Chaque lot est une opportunité de lutter contre le gaspillage et de soutenir votre activité associative." },
-    ];
     return (
       <main>
         <Hero
@@ -124,15 +135,10 @@ export default async function LotPage() {
           secondaryButtonHref="/contact"
         />
         <GestionLots lots={lots} adminView />
-        <Leo storageKey="leo-lots" steps={LEO_STEPS} />
+        <Leo storageKey="leo-lots-admin" steps={LEO_STEPS_ADMIN} />
       </main>
     );
   }
-
- const LEO_STEPS = [
-  { message: "Explorez les lots mis à disposition par nos commerçants partenaires et réservez ceux dont votre association a besoin." },
-  { message: "Chaque lot est une opportunité de lutter contre le gaspillage et de soutenir votre activité associative." },
- ];
 
   return (
     <main>
@@ -166,7 +172,7 @@ export default async function LotPage() {
         filterEmptyTitle="Aucun lot ne correspond à vos filtres"
         filterEmptySubtitle="Essayez d'élargir le rayon ou de changer la période."
       />
-      <Leo storageKey="leo-lots" steps={LEO_STEPS} />
+      <Leo storageKey="leo-lots-association" steps={LEO_STEPS_ASSOCIATION} />
     </main>
   );
 }
