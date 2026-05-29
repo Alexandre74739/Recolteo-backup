@@ -12,6 +12,7 @@ import InfoTab, { type EntityInfo } from "./InfoTab";
 import DocsTab from "./DocsTab";
 import BreachTab from "./BreachTab";
 import CollectesTab from "./CollectesTab";
+import CollectesAsso from "./CollectesAsso";
 import HistoriqueCommercantTab from "./HistoriqueCommercantTab";
 import HistoriqueAssociationTab from "./HistoriqueAssociationTab";
 import HistoriqueAdminTab from "./HistoriqueAdminTab";
@@ -22,6 +23,7 @@ type Tab = "info" | "docs" | "collectes" | "historique" | "securite";
 const BASE_TABS = [
   { value: "info", label: "Informations" },
   { value: "docs", label: "Documents" },
+  { value: "collectes", label: "Collectes" },
   { value: "historique", label: "Historique" },
 ];
 
@@ -92,6 +94,7 @@ export default function ProfilLayout({
             {tab === "info" && <InfoTab entityInfo={entityInfo} />}
             {tab === "docs" && <DocsTab role={role} authId={authId} />}
             {tab === "collectes" && role === "commercant" && <CollectesTab />}
+            {tab === "collectes" && role === "association" && <CollectesAsso />}
             {tab === "securite" && role === "admin" && <BreachTab />}
             {tab === "historique" && role === "commercant" && (
               <HistoriqueCommercantTab />
