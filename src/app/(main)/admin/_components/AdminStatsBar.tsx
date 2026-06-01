@@ -22,51 +22,76 @@ export default function AdminStatsBar({
     <div className="grid grid-cols-3 gap-3 sm:gap-4">
       <button
         onClick={() => onFilterChange(activeFilter === "all" ? "all" : "all")}
-        className={`text-left bg-white rounded-2xl p-4 flex flex-col gap-2 border-2 transition-all active:scale-[0.97] ${
+        className={`text-left bg-white rounded-2xl p-2 sm:p-4 flex flex-col gap-1 sm:gap-2 border-2 transition-all active:scale-[0.97] ${
           activeFilter === "all"
             ? "border-sapin shadow-[4px_4px_0_0_#06573F]"
             : "border-sapin/10 shadow-[3px_3px_0_0_rgba(6,87,63,0.06)] hover:border-sapin/30"
         }`}
       >
-        <div className={`flex items-center gap-2 ${activeFilter === "all" ? "text-sapin" : "text-sapin/50"}`}>
-          <Clock size={20} />
-          <span className="text-sm font-semibold uppercase tracking-wide">Total</span>
+        <div
+          className={`flex items-center gap-1 sm:gap-2 min-w-0 ${activeFilter === "all" ? "text-sapin" : "text-sapin/50"}`}
+        >
+          <Clock size={16} className="shrink-0 sm:hidden" />
+          <Clock size={20} className="shrink-0 hidden sm:block" />
+          <span className="text-[9px] sm:text-sm font-semibold uppercase tracking-wide truncate">
+            Total
+          </span>
         </div>
-        <p className={`font-black text-2xl sm:text-3xl leading-none ${activeFilter === "all" ? "text-sapin" : "text-sapin/70"}`}>
+        <p
+          className={`font-black text-xl sm:text-3xl leading-none ${activeFilter === "all" ? "text-sapin" : "text-sapin/70"}`}
+        >
           {total}
         </p>
       </button>
 
       <button
-        onClick={() => onFilterChange(activeFilter === "commercant" ? "all" : "commercant")}
-        className={`text-left bg-white rounded-2xl p-4 flex flex-col gap-2 border-2 transition-all active:scale-[0.97] ${
+        onClick={() =>
+          onFilterChange(activeFilter === "commercant" ? "all" : "commercant")
+        }
+        className={`text-left bg-white rounded-2xl p-2 sm:p-4 flex flex-col gap-1 sm:gap-2 border-2 transition-all active:scale-[0.97] ${
           activeFilter === "commercant"
             ? "border-peach shadow-[4px_4px_0_0_#f16012]"
             : "border-peach/20 shadow-[3px_3px_0_0_rgba(241,96,18,0.08)] hover:border-peach/50"
         }`}
       >
-        <div className={`flex items-center gap-2 ${activeFilter === "commercant" ? "text-peach" : "text-peach/70"}`}>
-          <ShoppingBag size={20} />
-          <span className="text-[10px] font-semibold uppercase tracking-wide -translate-x-3.5 lg:translate-x-1 sm:text-sm">Commerçants</span>
+        <div
+          className={`flex items-center gap-1 sm:gap-2 min-w-0 ${activeFilter === "commercant" ? "text-peach" : "text-peach/70"}`}
+        >
+          <ShoppingBag size={16} className="shrink-0 sm:hidden" />
+          <ShoppingBag size={20} className="shrink-0 hidden sm:block" />
+          <span className="text-[9px] sm:text-sm font-semibold uppercase tracking-wide truncate">
+            Commerçants
+          </span>
         </div>
-        <p className={`font-black text-2xl sm:text-3xl leading-none ${activeFilter === "commercant" ? "text-peach" : "text-peach/70"}`}>
+        <p
+          className={`font-black text-xl sm:text-3xl leading-none ${activeFilter === "commercant" ? "text-peach" : "text-peach/70"}`}
+        >
           {commercantsCount}
         </p>
       </button>
 
       <button
-        onClick={() => onFilterChange(activeFilter === "association" ? "all" : "association")}
-        className={`text-left bg-white rounded-2xl p-4 flex flex-col gap-2 border-2 transition-all active:scale-[0.97] ${
+        onClick={() =>
+          onFilterChange(activeFilter === "association" ? "all" : "association")
+        }
+        className={`text-left bg-white rounded-2xl p-2 sm:p-4 flex flex-col gap-1 sm:gap-2 border-2 transition-all active:scale-[0.97] ${
           activeFilter === "association"
             ? "border-sapin shadow-[4px_4px_0_0_#06573F]"
             : "border-lime/40 shadow-[3px_3px_0_0_rgba(201,242,66,0.2)] hover:border-lime/70"
         }`}
       >
-        <div className={`flex items-center gap-2 ${activeFilter === "association" ? "text-sapin" : "text-sapin/60"}`}>
-          <Users size={20} />
-          <span className="text-[10px] font-semibold uppercase tracking-wide -translate-x-3 lg:translate-x-1 sm:text-sm">Associations</span>
+        <div
+          className={`flex items-center gap-1 sm:gap-2 min-w-0 ${activeFilter === "association" ? "text-sapin" : "text-sapin/60"}`}
+        >
+          <Users size={16} className="shrink-0 sm:hidden" />
+          <Users size={20} className="shrink-0 hidden sm:block" />
+          <span className="text-[9px] sm:text-sm font-semibold uppercase tracking-wide truncate">
+            Associations
+          </span>
         </div>
-        <p className={`font-black text-2xl sm:text-3xl leading-none ${activeFilter === "association" ? "text-sapin" : "text-sapin/70"}`}>
+        <p
+          className={`font-black text-xl sm:text-3xl leading-none ${activeFilter === "association" ? "text-sapin" : "text-sapin/70"}`}
+        >
           {associationsCount}
         </p>
       </button>
