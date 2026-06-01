@@ -98,6 +98,17 @@ export async function reserverLots(
   if (!assoc)
     return { success: false, error: "Compte association introuvable." };
 
+  const { data: docRow } = await admin
+    .from("document")
+    .select("rib_validated, kbis_validated, piece_identite_validated")
+    .eq("type_entity", "association")
+    .eq("id_entity", assoc.id_association)
+    .maybeSingle();
+  const docsApproved =
+    docRow?.rib_validated && docRow?.kbis_validated && docRow?.piece_identite_validated;
+  if (!docsApproved)
+    return { success: false, error: "Vos documents doivent être approuvés par l'équipe Récoltéo avant de pouvoir réserver des lots." };
+
   const assocEmail = assoc.email ?? user.email;
   if (!assocEmail)
     return { success: false, error: "Email association introuvable." };

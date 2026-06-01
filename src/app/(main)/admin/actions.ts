@@ -46,6 +46,50 @@ async function logAdminAction(
   });
 }
 
+const VALID_ENTITY_TYPES = ["commercant", "association"] as const;
+const VALID_DOC_TYPES = ["rib", "kbis", "identite"] as const;
+const DOC_COL_MAP = {
+  rib: "rib_validated",
+  kbis: "kbis_validated",
+  identite: "piece_identite_validated",
+} as const;
+
+export async function approveDocument(formData: FormData) {
+  const { adminRow } = await assertAdmin();
+
+  const entityTypeRaw = formData.get("entityType");
+  const entityIdRaw = formData.get("entityId");
+  const docTypeRaw = formData.get("docType");
+
+  if (!VALID_ENTITY_TYPES.includes(entityTypeRaw as never))
+    throw new Error("entityType invalide");
+  if (!VALID_DOC_TYPES.includes(docTypeRaw as never))
+    throw new Error("docType invalide");
+
+  const entityType = entityTypeRaw as "commercant" | "association";
+  const docType = docTypeRaw as "rib" | "kbis" | "identite";
+  const entityId = parseInt(entityIdRaw as string, 10);
+  if (isNaN(entityId) || entityId <= 0) throw new Error("entityId invalide");
+
+  const admin = createAdminClient();
+  await admin
+    .from("document")
+    .update({ [DOC_COL_MAP[docType]]: true })
+    .eq("type_entity", entityType)
+    .eq("id_entity", entityId);
+
+  await logAdminAction(
+    adminRow.id_admin,
+    adminRow.prenom,
+    adminRow.nom,
+    "approbation_document",
+    entityType,
+    `${entityType}#${entityId} — ${docType}`,
+  );
+
+  revalidatePath("/admin/structures");
+}
+
 export async function resetCagnotte(formData: FormData) {
   const { adminRow } = await assertAdmin();
   const id = parseInt(formData.get("id") as string, 10);

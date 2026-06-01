@@ -1,14 +1,12 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/src/lib/supabase/server";
-import { createAdminClient } from "@/src/lib/supabase/admin";
-import { geocodeAddress } from "@/src/lib/geocode";
+import { FileText } from "@deemlol/next-icons";
 import Hero from "@/src/components/sections/Hero";
-import CatalogueLots, { type Lot } from "./_components/CatalogueLots";
+import CatalogueLots from "./_components/CatalogueLots";
 import GestionLots from "@/src/components/sections/GestionLots";
 import Leo from "@/src/components/ui/modals/Leo";
-
-const LOT_FIELDS =
-  "id_lot, id_commercant, name_entreprise, adresse, adresse_recup, instructions, category, nature, quantity, dlc, montant_chiffre, montant_lettre, created_at, lat, lng, horaires";
+import CatalogueDecorations from "@/src/components/illustrations/CatalogueDecorations";
+import Reveal from "@/src/components/animations/Reveal";
+import EmptyState from "@/src/components/ui/primitives/EmptyState";
+import { fetchLotsData } from "./_utils/fetchLots";
 
 const LEO_STEPS_COMMERCANT = [
   { message: "Bienvenue sur votre espace lots ! Déclarez ici vos invendus du jour en quelques clics pour les mettre à disposition des associations partenaires." },
@@ -29,41 +27,26 @@ const LEO_STEPS_ASSOCIATION = [
 ];
 
 export default async function LotPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const data = await fetchLotsData();
 
-  const { data: userRow } = await supabase
-    .from("user")
-    .select("id_user")
-    .eq("auth_id", user.id)
-    .maybeSingle();
+  if (data.view === "docs-gate") {
+    return (
+      <section className="relative min-h-[calc(100vh-80px)] flex items-center justify-center px-4 overflow-hidden">
+        <CatalogueDecorations />
+        <Reveal>
+          <EmptyState
+            icon={<FileText size={32} className="text-sapin/40" />}
+            title="Documents en attente de validation"
+            description="Pour accéder aux lots, déposez et faites valider vos 3 documents dans votre profil."
+            btnLabel="Mon profil"
+            btnHref="/profil"
+          />
+        </Reveal>
+      </section>
+    );
+  }
 
-  const [adminResult, commercantResult] = await Promise.all([
-    supabase.from("administrateur").select("id_admin").maybeSingle(),
-    userRow
-      ? supabase
-          .from("commercant")
-          .select("id_commercant")
-          .eq("id_user", userRow.id_user)
-          .eq("is_validated", true)
-          .maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
-  ]);
-
-  const isAdmin = !!adminResult.data;
-  const isCommercant = !!commercantResult.data;
-
-  if (isCommercant && !isAdmin) {
-    const { data: lotsData } = await supabase
-      .from("lot")
-      .select(LOT_FIELDS)
-      .eq("statut", true)
-      .eq("id_commercant", commercantResult.data!.id_commercant)
-      .order("created_at", { ascending: false });
-
+  if (data.view === "commercant") {
     return (
       <main>
         <Hero
@@ -78,46 +61,13 @@ export default async function LotPage() {
           secondaryButton="Mon profil"
           secondaryButtonHref="/profil"
         />
-        <GestionLots lots={(lotsData ?? []) as Lot[]} />
+        <GestionLots lots={data.lots} />
         <Leo storageKey="leo-lots-commercant" steps={LEO_STEPS_COMMERCANT} />
       </main>
     );
   }
 
-  const { data: lotsData } = await supabase
-    .from("lot")
-    .select(LOT_FIELDS)
-    .eq("statut", true)
-    .order("created_at", { ascending: false });
-
-  const lots = (lotsData ?? []) as Lot[];
-
-  let assoCoords: { lat: number; lng: number } | null = null;
-  if (!isAdmin && userRow) {
-    const { data: assoRow } = await supabase
-      .from("association")
-      .select("lat, lng, adresse")
-      .eq("id_user", userRow.id_user)
-      .maybeSingle();
-
-    if (assoRow) {
-      if (assoRow.lat && assoRow.lng) {
-        assoCoords = { lat: assoRow.lat, lng: assoRow.lng };
-      } else if (assoRow.adresse) {
-        const coords = await geocodeAddress(assoRow.adresse);
-        if (coords) {
-          assoCoords = coords;
-          const admin = createAdminClient();
-          await admin
-            .from("association")
-            .update({ lat: coords.lat, lng: coords.lng })
-            .eq("id_user", userRow.id_user);
-        }
-      }
-    }
-  }
-
-  if (isAdmin) {
+  if (data.view === "admin") {
     return (
       <main>
         <Hero
@@ -132,7 +82,7 @@ export default async function LotPage() {
           secondaryButton="Contactez-nous"
           secondaryButtonHref="/contact"
         />
-        <GestionLots lots={lots} adminView />
+        <GestionLots lots={data.lots} adminView />
         <Leo storageKey="leo-lots-admin" steps={LEO_STEPS_ADMIN} />
       </main>
     );
@@ -153,9 +103,9 @@ export default async function LotPage() {
         secondaryButtonHref="/contact"
       />
       <CatalogueLots
-        lots={lots}
+        lots={data.lots}
         showCartButton
-        assoCoords={assoCoords}
+        assoCoords={data.assoCoords}
         sectionTitle="Lots"
         sectionHighlight="disponibles"
         description="Découvrez les invendus et ressources mis à disposition par nos commerçants partenaires. Chaque lot est une opportunité de lutter contre le gaspillage et de soutenir votre activité associative."

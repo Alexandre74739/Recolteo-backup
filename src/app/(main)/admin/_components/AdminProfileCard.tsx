@@ -1,5 +1,5 @@
 import { Mail, Phone, Clock, Check, Trash2, FileText } from "@deemlol/next-icons";
-import { validateProfile, rejectProfile } from "../actions";
+import { validateProfile, rejectProfile, approveDocument } from "../actions";
 import { DOC_LABELS } from "@/src/lib/supabase/documents-types";
 import type { DocItem } from "./types";
 
@@ -147,18 +147,37 @@ export default function AdminProfileCard({
                   <FileText size={12} />
                   Documents
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col gap-2">
                   {docs.map((doc) => (
-                    <a
-                      key={doc.type}
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sapin text-cream text-xs font-bold border-2 border-sapin shadow-[2px_2px_0_0_#04251c] hover:bg-sapin/90 active:scale-[0.98] transition-all"
-                    >
-                      <FileText size={12} />
-                      {DOC_LABELS[doc.type]}
-                    </a>
+                    <div key={doc.type} className="flex items-center gap-2">
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sapin text-cream text-xs font-bold border-2 border-sapin shadow-[2px_2px_0_0_#04251c] hover:bg-sapin/90 active:scale-[0.98] transition-all"
+                      >
+                        <FileText size={12} />
+                        {DOC_LABELS[doc.type]}
+                      </a>
+                      {doc.validated ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-lime border border-sapin/20 text-sapin text-xs font-bold">
+                          <Check size={11} />
+                          Approuvé
+                        </span>
+                      ) : (
+                        <form action={approveDocument}>
+                          <input type="hidden" name="entityType" value={type} />
+                          <input type="hidden" name="entityId" value={id} />
+                          <input type="hidden" name="docType" value={doc.type} />
+                          <button
+                            type="submit"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border-2 border-sapin/20 text-sapin/60 text-xs font-bold hover:bg-sapin hover:text-cream hover:border-sapin active:scale-[0.98] transition-all"
+                          >
+                            Approuver
+                          </button>
+                        </form>
+                      )}
+                    </div>
                   ))}
                 </div>
               </>

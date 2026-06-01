@@ -96,17 +96,21 @@ export async function POST(
   if (uploadError) return new Response("Erreur stockage", { status: 500 });
 
   const col = DB_COL[ctx.docType];
+  const validatedCol = `${col}_validated`;
   const entity = await resolveEntity(ctx.user.id, admin);
   if (entity) {
-    const { data: existing } = await admin
+    const { data: rowExists } = await admin
       .from("document")
-      .select("id_document")
+      .select("id_entity")
       .eq("id_entity", entity.entityId)
       .eq("type_entity", entity.entityType)
       .maybeSingle();
 
-    if (existing) {
-      await admin.from("document").update({ [col]: path }).eq("id_document", existing.id_document);
+    if (rowExists) {
+      await admin.from("document")
+        .update({ [col]: path, [validatedCol]: false, notification_sent: false })
+        .eq("id_entity", entity.entityId)
+        .eq("type_entity", entity.entityType);
     } else {
       await admin.from("document").insert({
         id_entity: entity.entityId,
@@ -116,6 +120,7 @@ export async function POST(
         piece_identite: col === "piece_identite" ? path : "",
       });
     }
+
   }
 
   return Response.json({ ok: true });
@@ -138,9 +143,10 @@ export async function DELETE(
 
   const entity = await resolveEntity(ctx.user.id, admin);
   if (entity) {
+    const col = DB_COL[ctx.docType];
     await admin
       .from("document")
-      .update({ [DB_COL[ctx.docType]]: "" })
+      .update({ [col]: "", [`${col}_validated`]: false, notification_sent: false })
       .eq("id_entity", entity.entityId)
       .eq("type_entity", entity.entityType);
   }

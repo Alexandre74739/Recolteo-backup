@@ -10,8 +10,8 @@ import {
   getCommercantCollects,
   validerCollect,
   type CollectItem,
-} from "../actions";
-import { toLot } from "../utils";
+} from "../../actions";
+import { toLot } from "../../utils";
 
 function CollectCard({
   item,

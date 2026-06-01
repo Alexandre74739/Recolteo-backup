@@ -8,13 +8,13 @@ import TabToggle from "@/src/components/ui/primitives/TabToggle";
 import ValueCard from "@/src/components/ui/cards/ValueCard";
 import Reveal from "@/src/components/animations/Reveal";
 import ProfilHeader from "./ProfilHeader";
-import InfoTab, { type EntityInfo } from "./InfoTab";
-import DocsTab from "./DocsTab";
-import BreachTab from "./BreachTab";
-import CollectesTab from "./CollectesTab";
-import HistoriqueCommercantTab from "./HistoriqueCommercantTab";
-import HistoriqueAssociationTab from "./HistoriqueAssociationTab";
-import HistoriqueAdminTab from "./HistoriqueAdminTab";
+import InfoTab, { type EntityInfo } from "./tabs/InfoTab";
+import DocsTab from "./tabs/DocsTab";
+import BreachTab from "./tabs/BreachTab";
+import CollectesTab from "./tabs/CollectesTab";
+import HistoriqueCommercantTab from "./tabs/HistoriqueCommercantTab";
+import HistoriqueAssociationTab from "./tabs/HistoriqueAssociationTab";
+import HistoriqueAdminTab from "./tabs/HistoriqueAdminTab";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 
 type Tab = "info" | "docs" | "collectes" | "historique" | "securite";
@@ -48,16 +48,12 @@ const ROLE_SUBTITLE: Record<"commercant" | "association" | "admin", string> = {
 };
 
 interface ProfilLayoutProps {
-  nom: string;
   role: "commercant" | "association" | "admin";
-  authId: string;
   entityInfo: EntityInfo | null;
 }
 
 export default function ProfilLayout({
-  nom,
   role,
-  authId,
   entityInfo,
 }: ProfilLayoutProps) {
   const [tab, setTab] = useState<Tab>("info");
@@ -67,7 +63,7 @@ export default function ProfilLayout({
   return (
     <div className="flex flex-col gap-8">
       <Reveal delay={0}>
-        <ProfilHeader nom={nom} role={role} />
+        <ProfilHeader />
       </Reveal>
 
       <Reveal delay={0.08}>
@@ -90,7 +86,7 @@ export default function ProfilLayout({
           />
           <div className="min-h-72">
             {tab === "info" && <InfoTab entityInfo={entityInfo} />}
-            {tab === "docs" && <DocsTab role={role} authId={authId} />}
+            {tab === "docs" && <DocsTab role={role} />}
             {tab === "collectes" && role === "commercant" && <CollectesTab />}
             {tab === "securite" && role === "admin" && <BreachTab />}
             {tab === "historique" && role === "commercant" && (
