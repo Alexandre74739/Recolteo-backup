@@ -95,6 +95,7 @@ export default function HorairesSection({
             <button
               type="button"
               onClick={() => remove(i)}
+              aria-label="Supprimer le créneau"
               className="mb-0.5 p-2 rounded-xl text-peach/60 hover:text-peach hover:bg-peach/8 transition-colors self-end"
             >
               <Trash2 size={20} />

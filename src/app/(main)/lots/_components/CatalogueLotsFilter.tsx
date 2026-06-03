@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapPin, Calendar, Tag, ChevronDown } from "@deemlol/next-icons";
+import { MapPin, Calendar, Tag, ChevronDown, Clock, Plus, Trash2 } from "@deemlol/next-icons";
 import {
   readCookieConsent,
   openCookiePanel,
@@ -12,9 +12,11 @@ import RadiusSlider, {
   RADIUS_STEPS,
 } from "@/src/components/ui/primitives/RadiusSlider";
 import StepSlider from "@/src/components/ui/primitives/StepSlider";
+import Input from "@/src/components/ui/primitives/Input";
 import FilterPart from "@/src/components/ui/parts/FilterPart";
 import CatalogueGrid from "@/src/components/sections/CatalogueGrid";
-import type { Lot } from "@/src/components/ui/cards/LotCard";
+import type { Lot, Horaire } from "@/src/components/ui/cards/LotCard";
+import HorairesSection from "../declarer-lot/_components/HorairesSection";
 
 type DateFilter = "all" | "today" | "week" | "month";
 
@@ -80,6 +82,7 @@ export default function CatalogueLotsFilter({
   const [geoEnabled, setGeoEnabled] = useState(false);
   const [radiusIndex, setRadiusIndex] = useState(0);
   const [dateIndex, setDateIndex] = useState(0);
+  const [horaires, setHoraires] = useState<Horaire[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     new Set(),
   );
@@ -99,7 +102,36 @@ export default function CatalogueLotsFilter({
 
   const dateFilter = DATE_FILTER_MAP[dateIndex];
   const isDateFiltered = dateIndex > 0;
+  const isAvailabilityFiltered = horaires.length > 0;
   const isCategoryFiltered = selectedCategories.size > 0;
+
+  function addHoraire() {
+    setHoraires((prev) => [
+      ...prev,
+      { jour: "Lundi", debut: "08:00", fin: "18:00" },
+    ]);
+  }
+
+  function removeHoraire(index: number) {
+    setHoraires((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateHoraire(index: number, field: keyof Horaire, value: string) {
+    setHoraires((prev) => prev.map((h, i) => (i === index ? { ...h, [field]: value } : h)));
+  }
+
+  function timeToMinutes(t: string) {
+    const [hh, mm] = t.split(":").map(Number);
+    return hh * 60 + mm;
+  }
+
+  function rangesOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+    const a0 = timeToMinutes(aStart);
+    const a1 = timeToMinutes(aEnd);
+    const b0 = timeToMinutes(bStart);
+    const b1 = timeToMinutes(bEnd);
+    return Math.max(a0, b0) < Math.min(a1, b1);
+  }
 
   const filtered = lots.filter((lot) => {
     if (dateFilter === "today" && !isWithinDays(lot.created_at, 1))
@@ -119,6 +151,13 @@ export default function CatalogueLotsFilter({
       if (dist > radiusKm) return false;
     }
 
+    if (isAvailabilityFiltered) {
+      const matches = (lot.horaires || []).some((lotH) =>
+        horaires.some((h) => rangesOverlap(h.debut, h.fin, lotH.debut, lotH.fin)),
+      );
+      if (!matches) return false;
+    }
+
     if (isCategoryFiltered && !selectedCategories.has(lot.category))
       return false;
 
@@ -128,6 +167,7 @@ export default function CatalogueLotsFilter({
   const activeCount =
     (applyRadius ? 1 : 0) +
     (isDateFiltered ? 1 : 0) +
+    (isAvailabilityFiltered ? 1 : 0) +
     (isCategoryFiltered ? 1 : 0);
 
   function toggleCategory(cat: string) {
@@ -213,6 +253,75 @@ export default function CatalogueLotsFilter({
                     label="Période de parution"
                   />
                 </FilterPart>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <FilterPart
+                  icon={<Clock size={20} />}
+                  title="Disponibilités"
+                  subtitle="Ajoutez les créneaux horaires disponibles pour la récupération."
+                  isActive={isAvailabilityFiltered}
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-sm font-bold text-sapin/40 uppercase tracking-widest">
+                        Disponibilités
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={addHoraire}
+                        className="flex items-center gap-1.5 text-xs font-semibold text-sapin border border-sapin/20 rounded-xl px-3 py-1.5 hover:bg-sapin/6 transition-colors"
+                      >
+                        <Plus size={16} />
+                        Ajouter un créneau
+                      </button>
+                    </div>
+
+                    {horaires.length === 0 && (
+                      <p className="text-xs text-sapin/40 italic px-1">
+                        Aucun créneau défini. Ajoutez vos disponibilités pour que les
+                        associations puissent choisir un horaire adapté.
+                      </p>
+                    )}
+
+                    <div className="flex flex-col gap-3">
+                      {horaires.map((h, i) => (
+                        <div
+                          key={i}
+                          className="grid grid-cols-[1fr_1fr_auto] gap-3 items-end bg-sapin/3 border border-sapin/8 rounded-xl px-4 py-3"
+                        >
+                          <Input
+                            id={`horaire_debut_${i}`}
+                            name={`horaire_debut_${i}`}
+                            label="De"
+                            type="time"
+                            value={h.debut}
+                            onChange={(v) => updateHoraire(i, "debut", v)}
+                          />
+                          <Input
+                            id={`horaire_fin_${i}`}
+                            name={`horaire_fin_${i}`}
+                            label="À"
+                            type="time"
+                            value={h.fin}
+                            onChange={(v) => updateHoraire(i, "fin", v)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeHoraire(i)}
+                            aria-label="Supprimer le créneau"
+                            className="mb-0.5 p-2 rounded-xl text-peach/60 hover:text-peach hover:bg-peach/8 transition-colors self-end"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <input type="hidden" name="horaires_filter" value={JSON.stringify(horaires)} />
+                  </div>
+                </FilterPart>
+                
               </div>
 
               {categories.length > 0 && (
