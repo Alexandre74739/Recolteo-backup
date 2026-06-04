@@ -32,29 +32,53 @@ export async function importerLots(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Non authentifié." };
 
+  const { data: userRow } = await supabase
+    .from("user")
+    .select("id_user")
+    .eq("auth_id", user.id)
+    .maybeSingle();
+
   const [adminResult, commercantResult] = await Promise.all([
     supabase.from("administrateur").select("id_admin").maybeSingle(),
-    supabase
-      .from("commercant")
-      .select("id_commercant, name_entreprise, adresse")
-      .eq("is_validated", true)
-      .maybeSingle(),
+    userRow
+      ? supabase
+          .from("commercant")
+          .select("id_commercant, name_entreprise, adresse")
+          .eq("id_user", userRow.id_user)
+          .eq("is_validated", true)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   if (!adminResult.data && !commercantResult.data) {
     return { error: "Accès refusé." };
   }
 
+  if (rows.length > 200) {
+    return { error: "Maximum 200 lots par import." };
+  }
+
   const id =
     adminResult.data && commercantId
       ? commercantId
       : commercantResult.data?.id_commercant;
-  const name = commercantResult.data?.name_entreprise ?? "";
-  const adresse = commercantResult.data?.adresse ?? "";
 
   if (!id) return { error: "Commerçant introuvable." };
 
   const admin = createAdminClient();
+
+  let name = commercantResult.data?.name_entreprise ?? "";
+  let adresse = commercantResult.data?.adresse ?? "";
+
+  if (adminResult.data && commercantId) {
+    const { data: targetCommercant } = await admin
+      .from("commercant")
+      .select("name_entreprise, adresse")
+      .eq("id_commercant", commercantId)
+      .maybeSingle();
+    name = targetCommercant?.name_entreprise ?? "";
+    adresse = targetCommercant?.adresse ?? "";
+  }
 
   for (const row of rows) {
     const { data: inserted, error } = await admin
@@ -78,7 +102,7 @@ export async function importerLots(
       .single();
 
     if (error || !inserted) {
-      return { error: `Erreur sur le lot "${row.nature}" : ${error?.message}` };
+      return { error: `Erreur lors de l'import du lot "${row.nature}".` };
     }
 
     const coords = await geocodeAddress(row.adresse_recup);
@@ -103,13 +127,22 @@ export async function declarerLot(
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: userRow } = await supabase
+    .from("user")
+    .select("id_user")
+    .eq("auth_id", user.id)
+    .maybeSingle();
+
   const [adminResult, commercantResult] = await Promise.all([
     supabase.from("administrateur").select("id_admin").maybeSingle(),
-    supabase
-      .from("commercant")
-      .select("id_commercant")
-      .eq("is_validated", true)
-      .maybeSingle(),
+    userRow
+      ? supabase
+          .from("commercant")
+          .select("id_commercant, name_entreprise, adresse")
+          .eq("id_user", userRow.id_user)
+          .eq("is_validated", true)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   if (!adminResult.data && !commercantResult.data) {
@@ -136,13 +169,24 @@ export async function declarerLot(
     horaires = [];
   }
 
+  const isAdmin = !!adminResult.data;
+  const idCommercant = isAdmin
+    ? parseInt(formData.get("id_commercant") as string, 10)
+    : commercantResult.data!.id_commercant;
+  const nameEntreprise = isAdmin
+    ? (formData.get("name_entreprise") as string).trim()
+    : (commercantResult.data as { id_commercant: number; name_entreprise: string; adresse: string }).name_entreprise;
+  const adresseEntreprise = isAdmin
+    ? (formData.get("adresse") as string).trim()
+    : (commercantResult.data as { id_commercant: number; name_entreprise: string; adresse: string }).adresse;
+
   const admin = createAdminClient();
   const { data: inserted, error } = await admin
     .from("lot")
     .insert({
-      id_commercant: parseInt(formData.get("id_commercant") as string, 10),
-      name_entreprise: (formData.get("name_entreprise") as string).trim(),
-      adresse: (formData.get("adresse") as string).trim(),
+      id_commercant: idCommercant,
+      name_entreprise: nameEntreprise,
+      adresse: adresseEntreprise,
       adresse_recup,
       instructions:
         ((formData.get("instructions") as string) || "").trim() || null,
@@ -159,7 +203,7 @@ export async function declarerLot(
     .single();
 
   if (error || !inserted) {
-    return { error: `Erreur lors de la déclaration : ${error?.message}` };
+    return { error: "Erreur lors de la déclaration du lot." };
   }
 
   const coords = await geocodeAddress(adresse_recup);
