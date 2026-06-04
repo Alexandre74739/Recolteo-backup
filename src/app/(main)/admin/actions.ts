@@ -1,28 +1,11 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
-import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { generateCerfa } from "@/src/lib/cerfa";
+import { assertAdmin } from "./_utils/fetchAdmin";
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: adminRow } = await supabase
-    .from("administrateur")
-    .select("id_admin, nom, prenom")
-    .maybeSingle();
-  if (!adminRow) redirect("/");
-
-  return { supabase, adminRow };
-}
 
 async function logAdminAction(
   idAdmin: number,
