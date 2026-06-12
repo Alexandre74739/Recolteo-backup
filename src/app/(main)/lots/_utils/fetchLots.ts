@@ -105,10 +105,16 @@ export async function fetchLotsData(): Promise<LotPageData> {
     const coords = await geocodeAddress(assoRow.adresse);
     if (coords) {
       assoCoords = coords;
-      await adminClient
-        .from("association")
-        .update({ lat: coords.lat, lng: coords.lng })
-        .eq("id_user", userRow.id_user);
+      void (async () => {
+        try {
+          await adminClient
+            .from("association")
+            .update({ lat: coords.lat, lng: coords.lng })
+            .eq("id_user", userRow.id_user);
+        } catch (err) {
+          console.error("[geocode] Échec mise en cache coordonnées:", err instanceof Error ? err.message : String(err));
+        }
+      })();
     }
   }
 

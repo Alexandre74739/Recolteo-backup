@@ -400,9 +400,22 @@ export async function validerCollectsParCode(code: string): Promise<ValiderResul
 
   const totalMontant = collects.reduce((sum, c) => sum + (c.lot?.montant_chiffre ?? 0), 0);
   const stripeAmount = Math.round(totalMontant * COMMISSION_RATE * 100);
+  const now = new Date().toISOString();
+  const collectIds = collects.map((c) => c.id_collect);
+
+  // Atomic claim: prevents duplicate processing under concurrent requests
+  const { data: claimed } = await admin
+    .from("collect")
+    .update({ statut: true, code_valide_at: now })
+    .in("id_collect", collectIds)
+    .eq("statut", false)
+    .select("id_collect");
+
+  if (!claimed?.length)
+    return { success: false, error: "Ces collectes ont déjà été validées." };
 
   if (stripeAmount > 0) {
-    const idempotencyKey = `commission-${collects.map((c) => c.id_collect).sort().join("-")}`;
+    const idempotencyKey = `commission-${collectIds.slice().sort().join("-")}`;
     try {
       const pi = await stripe.paymentIntents.create(
         {
@@ -415,26 +428,22 @@ export async function validerCollectsParCode(code: string): Promise<ValiderResul
           description: `Commission Récoltéo — ${new Date().toLocaleDateString("fr-FR")}`,
           metadata: {
             id_commercant: String(commercant.id_commercant),
-            collect_ids: collects.map((c) => c.id_collect).join(","),
+            collect_ids: collectIds.join(","),
           },
         },
         { idempotencyKey },
       );
-      if (pi.status !== "succeeded" && pi.status !== "processing")
+      if (pi.status !== "succeeded" && pi.status !== "processing") {
+        await admin.from("collect").update({ statut: false, code_valide_at: null }).in("id_collect", collectIds);
         return { success: false, error: "Le paiement a échoué. Vérifiez votre moyen de paiement." };
+      }
     } catch {
+      await admin.from("collect").update({ statut: false, code_valide_at: null }).in("id_collect", collectIds);
       return { success: false, error: "Erreur lors du paiement. Veuillez réessayer." };
     }
   }
 
-  const now = new Date().toISOString();
-
   for (const collect of collects) {
-    await admin
-      .from("collect")
-      .update({ statut: true, code_valide_at: now })
-      .eq("id_collect", collect.id_collect);
-
     if (!collect.lot) continue;
 
     const { count: alreadyProcessed } = await admin

@@ -31,6 +31,14 @@ export async function POST(req: NextRequest) {
   if (!asso.stripe_customer_id)
     return Response.json({ error: "Client Stripe non initialisé" }, { status: 400 });
 
+  try {
+    const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+    if (pm.customer !== asso.stripe_customer_id)
+      return Response.json({ error: "Ce moyen de paiement n'appartient pas à votre compte" }, { status: 400 });
+  } catch {
+    return Response.json({ error: "Moyen de paiement introuvable" }, { status: 400 });
+  }
+
   if (asso.stripe_subscription_id) {
     const existing = await stripe.subscriptions.retrieve(asso.stripe_subscription_id);
     if (["active", "trialing"].includes(existing.status)) {

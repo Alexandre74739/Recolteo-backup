@@ -252,7 +252,8 @@ export async function getPendingCollects(): Promise<CollectAdminItem[]> {
     .from("collect")
     .select("id_collect, id_lot, id_association, code_retrait, creneau")
     .eq("statut", false)
-    .order("creneau", { ascending: true });
+    .order("creneau", { ascending: true })
+    .limit(ADMIN_PAGE_SIZE);
 
   if (!collects?.length) return [];
 
@@ -307,14 +308,17 @@ export async function getPendingCollects(): Promise<CollectAdminItem[]> {
   });
 }
 
-export async function getAllCollectsAdmin(): Promise<CollectAdminItem[]> {
+const ADMIN_PAGE_SIZE = 200;
+
+export async function getAllCollectsAdmin(page = 0): Promise<CollectAdminItem[]> {
   await assertAdmin();
   const admin = createAdminClient();
 
   const { data: collects } = await admin
     .from("collect")
     .select("id_collect, id_lot, id_association, code_retrait, creneau, statut")
-    .order("creneau", { ascending: false });
+    .order("creneau", { ascending: false })
+    .range(page * ADMIN_PAGE_SIZE, (page + 1) * ADMIN_PAGE_SIZE - 1);
 
   if (!collects?.length) return [];
 
