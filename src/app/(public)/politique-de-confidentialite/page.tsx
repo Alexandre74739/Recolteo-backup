@@ -8,7 +8,7 @@ export default function PolitiqueDeConfidentialite() {
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-sapin mb-4">
           Politique de confidentialité
         </h1>
-        <p className="text-sapin/60 text-sm mb-10">Dernière mise à jour : mai 2026</p>
+        <p className="text-sapin/60 text-sm mb-10">Dernière mise à jour : juin 2026</p>
         <p className="mb-8">
           La présente politique a pour objet d'informer les utilisateurs de la plateforme Récoltéo
           sur la manière dont leurs données personnelles sont collectées, utilisées et protégées,
@@ -76,6 +76,16 @@ export default function PolitiqueDeConfidentialite() {
                 items: ["Identifiants de connexion (gérés par Supabase Auth)", "Historique des interactions (lots, réservations)"],
               },
               {
+                title: "Données de paiement",
+                items: [
+                  "Identifiant client Stripe",
+                  "Type de moyen de paiement (carte bancaire ou prélèvement SEPA) et 4 derniers chiffres",
+                  "Identifiant et statut de l'abonnement Stripe (associations uniquement)",
+                  "Date de fin de période d'abonnement en cours",
+                  "Aucune coordonnée bancaire complète n'est stockée par Récoltéo — données traitées exclusivement par Stripe (certifié PCI-DSS niveau 1)",
+                ],
+              },
+              {
                 title: "Documents justificatifs",
                 items: ["RIB, Kbis, pièce d'identité (transmis volontairement, chiffrés AES-256-GCM côté serveur)"],
               },
@@ -109,6 +119,9 @@ export default function PolitiqueDeConfidentialite() {
               <li>Gestion des lots, réservations et reçus CERFA</li>
               <li>Envoi d'emails transactionnels (confirmation, notifications)</li>
               <li>Sécurisation des comptes et prévention des fraudes</li>
+              <li>Gestion des abonnements annuels et facturation automatique (associations)</li>
+              <li>Prélèvement automatique des commissions sur collectes validées (commerçants)</li>
+              <li>Envoi de notifications de renouvellement et de statut d'abonnement</li>
               <li>Filtre de proximité géographique (associations consentantes)</li>
               <li>Respect des obligations légales et réglementaires</li>
             </ul>
@@ -121,7 +134,7 @@ export default function PolitiqueDeConfidentialite() {
           <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">6. Base légale du traitement</h2>
           <div className="space-y-3">
             {[
-              { base: "Art. 6.1.b — Exécution du contrat", detail: "Création de compte, gestion des lots et réservations, emails transactionnels." },
+              { base: "Art. 6.1.b — Exécution du contrat", detail: "Création de compte, gestion des lots et réservations, emails transactionnels, gestion des abonnements et facturation, prélèvement des commissions sur collectes." },
               { base: "Art. 6.1.c — Obligation légale", detail: "Conservation des données comptables et fiscales, reçus CERFA." },
               { base: "Art. 6.1.f — Intérêt légitime", detail: "Sécurité de la plateforme, prévention de la fraude." },
               { base: "Art. 6.1.a — Consentement", detail: "Cookies optionnels, géolocalisation de l'adresse, notifications utilisateurs en cas de violation de données." },
@@ -143,7 +156,7 @@ export default function PolitiqueDeConfidentialite() {
               { name: "Supabase", role: "Base de données et authentification", dpa: true },
               { name: "Vercel", role: "Hébergement de la plateforme", dpa: true },
               { name: "Resend", role: "Envoi d'emails transactionnels", dpa: true },
-              { name: "Stripe", role: "Traitement des paiements (données bancaires non stockées par Récoltéo)", dpa: true },
+              { name: "Stripe", role: "Traitement des paiements, abonnements associations et commissions commerçants — certifié PCI-DSS niveau 1 ; aucune coordonnée bancaire complète stockée par Récoltéo", dpa: true },
               { name: "API Base Adresse Nationale (Etalab)", role: "Géocodage des adresses postales (avec consentement) — service public français, ne conserve pas les données", dpa: false },
             ].map(({ name, role, dpa }) => (
               <div key={name} className="border border-sapin/10 rounded-2xl p-4 bg-beige/40 flex items-start gap-3">
@@ -204,6 +217,10 @@ export default function PolitiqueDeConfidentialite() {
                   <td className="py-2">5 ans (obligations légales et fiscales)</td>
                 </tr>
                 <tr>
+                  <td className="py-2 pr-4">Données de paiement Stripe (identifiant client, moyen de paiement, abonnement)</td>
+                  <td className="py-2">Durée de la relation + 10 ans (obligations comptables et fiscales)</td>
+                </tr>
+                <tr>
                   <td className="py-2 pr-4">Données de contact (formulaire)</td>
                   <td className="py-2">3 ans à compter de la dernière interaction</td>
                 </tr>
@@ -242,9 +259,41 @@ export default function PolitiqueDeConfidentialite() {
         </section>
       </Reveal>
 
+      <Reveal delay={1.95}>
+        <section className="mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">11. Traitement des données de paiement</h2>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80 space-y-3">
+            <div>
+              <p className="font-semibold text-sapin mb-2">Modèle économique de la plateforme</p>
+              <ul className="list-disc list-inside text-sapin/70 space-y-1">
+                <li><strong>Associations :</strong> abonnement annuel avec période d'essai gratuite de 6 mois, géré via Stripe.</li>
+                <li><strong>Commerçants :</strong> commission de 10 % prélevée automatiquement par Stripe à chaque validation de collecte.</li>
+              </ul>
+            </div>
+            <p className="text-sapin/70">
+              Le traitement des paiements est confié exclusivement à <strong>Stripe Inc.</strong>,
+              prestataire certifié <strong>PCI-DSS niveau 1</strong>. Les coordonnées bancaires complètes
+              (numéro de carte, IBAN complet) ne transitent jamais par les serveurs de Récoltéo et ne
+              sont pas stockées dans notre base de données.
+            </p>
+            <p className="text-sapin/70">
+              Récoltéo conserve uniquement : l'identifiant client Stripe, le type et les 4 derniers chiffres
+              du moyen de paiement, l'identifiant et le statut de l'abonnement, ainsi que la date de fin de
+              période. Ces données sont traitées sur la base légale de l'exécution du contrat (Art. 6.1.b RGPD).
+            </p>
+            <p className="text-sapin/70">
+              En cas de litige ou d'anomalie de facturation, contactez-nous à{" "}
+              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors">
+                digitalbylucie@gmail.com
+              </a>.
+            </p>
+          </div>
+        </section>
+      </Reveal>
+
       <Reveal delay={1.9}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">11. Vos droits</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">12. Vos droits</h2>
           <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 mb-4">
             <p className="text-sm text-sapin/80 mb-3">Conformément au RGPD, vous disposez des droits suivants :</p>
             <ul className="list-disc list-inside text-sm text-sapin/70 space-y-1">
@@ -276,7 +325,7 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={2.0}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">12. Modification de la politique</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">13. Modification de la politique</h2>
           <p className="text-sm text-sapin/70">
             Récoltéo se réserve le droit de modifier la présente politique à tout moment. Les utilisateurs
             seront informés des modifications importantes via la plateforme ou par email. La version en
@@ -287,7 +336,7 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={2.1}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">13. Contact</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">14. Contact</h2>
           <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80 space-y-1">
             <p><strong>Récoltéo</strong> — Responsable : Lucie Curtatone</p>
             <p><strong>Adresse :</strong> 6 rue du Bac, 38190 Villard Bonnot</p>
@@ -303,7 +352,7 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={2.2}>
         <p className="text-xs text-sapin/40 border-t border-sapin/10 pt-6">
-          Politique de confidentialité Récoltéo — mai 2026 — Conforme au RGPD (Règlement UE 2016/679).
+          Politique de confidentialité Récoltéo — juin 2026 — Conforme au RGPD (Règlement UE 2016/679).
         </p>
       </Reveal>
     </main>
