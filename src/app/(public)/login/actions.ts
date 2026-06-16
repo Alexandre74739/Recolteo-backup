@@ -5,6 +5,7 @@ import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { notifyAdminNewProfile } from "@/src/lib/email";
 import { geocodeAddress } from "@/src/lib/geocode";
+import { stripe } from "@/src/lib/stripe";
 
 export type ActionState = {
   error?: string;
@@ -219,6 +220,20 @@ export async function deleteAccount() {
   }
 
   if (userRow) {
+    const [{ data: assoStripe }, { data: commercantStripe }] = await Promise.all([
+      admin.from("association").select("stripe_subscription_id, stripe_customer_id").eq("id_user", userRow.id_user).maybeSingle(),
+      admin.from("commercant").select("stripe_payment_method_id").eq("id_user", userRow.id_user).maybeSingle(),
+    ]);
+
+    await Promise.allSettled([
+      assoStripe?.stripe_subscription_id
+        ? stripe.subscriptions.cancel(assoStripe.stripe_subscription_id)
+        : Promise.resolve(),
+      commercantStripe?.stripe_payment_method_id
+        ? stripe.paymentMethods.detach(commercantStripe.stripe_payment_method_id)
+        : Promise.resolve(),
+    ]);
+
     await admin.from("commercant").delete().eq("id_user", userRow.id_user);
     await admin.from("association").delete().eq("id_user", userRow.id_user);
     await admin.from("user").delete().eq("id_user", userRow.id_user);

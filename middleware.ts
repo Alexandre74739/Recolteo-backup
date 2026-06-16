@@ -39,9 +39,23 @@ async function checkLoginRateLimit(ip: string): Promise<boolean> {
 }
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const isLoginPage = pathname.startsWith("/login");
+  const isPublicPage =
+    pathname === "/" ||
+    pathname === "/decouvrir-recolteo" ||
+    pathname === "/contact" ||
+    pathname === "/mentions-legales" ||
+    pathname === "/politique-de-confidentialite" ||
+    pathname === "/cookies";
+
+  if (isPublicPage) {
+    return NextResponse.next({ request });
+  }
+
   if (
     request.method === "POST" &&
-    request.nextUrl.pathname.startsWith("/login") &&
+    isLoginPage &&
     request.headers.has("next-action")
   ) {
     const ip =
@@ -88,17 +102,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
-  const { pathname } = request.nextUrl;
-  const isLoginPage = pathname.startsWith("/login");
-  const isPublicPage =
-    pathname === "/" ||
-    pathname === "/decouvrir-recolteo" ||
-    pathname === "/contact" ||
-    pathname === "/mentions-legales" ||
-    pathname === "/politique-de-confidentialite" ||
-    pathname === "/cookies";
-
-  if (!user && !isLoginPage && !isPublicPage) {
+  if (!user && !isLoginPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
