@@ -454,10 +454,8 @@ export async function validerCollectAdmin(
     return { success: false, error: "Association introuvable." };
   if (!commercant) return { success: false, error: "Commerçant introuvable." };
 
-  const { count: docCount } = await admin
-    .from("document_fiscal")
-    .select("id_doc_fiscal", { count: "exact", head: true });
-  const numeroSequentiel = String((docCount ?? 0) + 1);
+  const { data: nextNumero } = await admin.rpc("next_cerfa_numero");
+  const numeroSequentiel = nextNumero as string;
 
   const { error: updateError } = await admin
     .from("collect")

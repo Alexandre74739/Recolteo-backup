@@ -80,10 +80,10 @@ export async function importerLots(
     adresse = targetCommercant?.adresse ?? "";
   }
 
-  for (const row of rows) {
-    const { data: inserted, error } = await admin
-      .from("lot")
-      .insert({
+  const { data: inserted, error } = await admin
+    .from("lot")
+    .insert(
+      rows.map((row) => ({
         id_commercant: id,
         name_entreprise: name,
         adresse,
@@ -97,21 +97,24 @@ export async function importerLots(
         montant_lettre: row.montant_lettre,
         horaires: row.horaires,
         statut: true,
-      })
-      .select("id_lot")
-      .single();
+      })),
+    )
+    .select("id_lot, adresse_recup");
 
-    if (error || !inserted) {
-      return { error: `Erreur lors de l'import du lot "${row.nature}".` };
-    }
+  if (error || !inserted?.length) {
+    return { error: "Erreur lors de l'import des lots." };
+  }
 
-    const coords = await geocodeAddress(row.adresse_recup);
-    if (coords) {
-      await admin
-        .from("lot")
-        .update({ lat: coords.lat, lng: coords.lng })
-        .eq("id_lot", inserted.id_lot);
-    }
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < inserted.length; i += BATCH_SIZE) {
+    await Promise.all(
+      inserted.slice(i, i + BATCH_SIZE).map(async (lot) => {
+        const coords = await geocodeAddress(lot.adresse_recup);
+        if (coords) {
+          await admin.from("lot").update({ lat: coords.lat, lng: coords.lng }).eq("id_lot", lot.id_lot);
+        }
+      }),
+    );
   }
 
   return {};

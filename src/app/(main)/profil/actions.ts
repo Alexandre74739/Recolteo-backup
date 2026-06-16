@@ -203,7 +203,7 @@ export async function validerCollect(
 
   const { data: collect } = await admin
     .from("collect")
-    .select("id_collect, id_association, date, code_retrait")
+    .select("id_collect, id_association, date, creneau, code_retrait")
     .eq("id_lot", idLot)
     .eq("statut", false)
     .maybeSingle();
@@ -221,10 +221,8 @@ export async function validerCollect(
   if (!association)
     return { success: false, error: "Association introuvable." };
 
-  const { count: docCount } = await admin
-    .from("document_fiscal")
-    .select("id_doc_fiscal", { count: "exact", head: true });
-  const numeroSequentiel = String((docCount ?? 0) + 1);
+  const { data: nextNumero } = await admin.rpc("next_cerfa_numero");
+  const numeroSequentiel = nextNumero as string;
 
   const { error: updateError } = await admin
     .from("collect")
@@ -294,7 +292,7 @@ export async function validerCollect(
     }
   }
 
-  const creneauLabel = formatCreneau(collect.date);
+  const creneauLabel = formatCreneau(collect.creneau);
 
   await resend.emails.send({
     from: "Récoltéo <onboarding@resend.dev>",
@@ -452,10 +450,8 @@ export async function validerCollectsParCode(code: string): Promise<ValiderResul
       .eq("id_collect", collect.id_collect);
     if (alreadyProcessed && alreadyProcessed > 0) continue;
 
-    const { count: docCount } = await admin
-      .from("document_fiscal")
-      .select("id_doc_fiscal", { count: "exact", head: true });
-    const numeroSequentiel = String((docCount ?? 0) + 1);
+    const { data: nextNumero } = await admin.rpc("next_cerfa_numero");
+    const numeroSequentiel = nextNumero as string;
 
     await admin.from("document_fiscal").insert({
       id_collect: collect.id_collect,
