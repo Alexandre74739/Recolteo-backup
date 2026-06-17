@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapPin, Calendar, Tag, ChevronDown } from "@deemlol/next-icons";
+import { MapPin, Calendar, Tag, ChevronDown, Clock } from "@deemlol/next-icons";
 import {
   readCookieConsent,
   openCookiePanel,
@@ -25,6 +25,24 @@ const DATE_STEPS = [
   "Ce mois",
 ] as const;
 const DATE_FILTER_MAP: DateFilter[] = ["all", "today", "week", "month"];
+const JOURS = [
+  "Lundi",
+  "Mardi",
+  "Mercredi",
+  "Jeudi",
+  "Vendredi",
+  "Samedi",
+  "Dimanche",
+];
+const JOURS_SHORT: Record<string, string> = {
+  Lundi: "Lun",
+  Mardi: "Mar",
+  Mercredi: "Mer",
+  Jeudi: "Jeu",
+  Vendredi: "Ven",
+  Samedi: "Sam",
+  Dimanche: "Dim",
+};
 
 function haversineKm(
   lat1: number,
@@ -38,8 +56,8 @@ function haversineKm(
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLng / 2) ** 2;
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -47,6 +65,46 @@ function isWithinDays(dateStr: string, days: number): boolean {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
   return new Date(dateStr) >= cutoff;
+}
+
+function PillButton({
+  label,
+  checked,
+  onClick,
+}: {
+  label: string;
+  checked: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold transition-all duration-150 ${
+        checked
+          ? "bg-sapin text-lime border-sapin"
+          : "bg-lime/20 text-sapin/60 border-sapin/20 hover:border-sapin/50 hover:text-sapin hover:bg-lime/40"
+      }`}
+    >
+      <span
+        className={`w-3.5 h-3.5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-colors ${checked ? "bg-lime border-lime" : "border-current opacity-50"}`}
+      >
+        {checked && (
+          <svg viewBox="0 0 10 8" className="w-2 h-2">
+            <path
+              d="M1 4l3 3 5-6"
+              stroke="#06573F"
+              strokeWidth="1.8"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+      </span>
+      {label}
+    </button>
+  );
 }
 
 interface Props {
@@ -83,6 +141,7 @@ export default function CatalogueLotsFilter({
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     new Set(),
   );
+  const [selectedDays, setSelectedDays] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const update = () => setGeoEnabled(readCookieConsent().geolocalisation);
@@ -92,14 +151,13 @@ export default function CatalogueLotsFilter({
   }, []);
 
   const categories = Array.from(new Set(lots.map((l) => l.category))).sort();
-
   const canUseRadius = geoEnabled && assoCoords !== null;
   const applyRadius = canUseRadius && radiusIndex > 0;
   const radiusKm = applyRadius ? RADIUS_STEPS[radiusIndex - 1] : null;
-
   const dateFilter = DATE_FILTER_MAP[dateIndex];
   const isDateFiltered = dateIndex > 0;
   const isCategoryFiltered = selectedCategories.size > 0;
+  const isDayFiltered = selectedDays.size > 0;
 
   const filtered = lots.filter((lot) => {
     if (dateFilter === "today" && !isWithinDays(lot.created_at, 1))
@@ -107,34 +165,35 @@ export default function CatalogueLotsFilter({
     if (dateFilter === "week" && !isWithinDays(lot.created_at, 7)) return false;
     if (dateFilter === "month" && !isWithinDays(lot.created_at, 30))
       return false;
-
     if (applyRadius && radiusKm !== null) {
       if (lot.lat == null || lot.lng == null) return false;
-      const dist = haversineKm(
-        assoCoords!.lat,
-        assoCoords!.lng,
-        lot.lat,
-        lot.lng,
-      );
-      if (dist > radiusKm) return false;
+      if (
+        haversineKm(assoCoords!.lat, assoCoords!.lng, lot.lat, lot.lng) >
+        radiusKm
+      )
+        return false;
     }
-
     if (isCategoryFiltered && !selectedCategories.has(lot.category))
       return false;
-
+    if (isDayFiltered && !lot.horaires.some((h) => selectedDays.has(h.jour)))
+      return false;
     return true;
   });
 
   const activeCount =
     (applyRadius ? 1 : 0) +
     (isDateFiltered ? 1 : 0) +
-    (isCategoryFiltered ? 1 : 0);
+    (isCategoryFiltered ? 1 : 0) +
+    (isDayFiltered ? 1 : 0);
 
-  function toggleCategory(cat: string) {
-    setSelectedCategories((prev) => {
+  function toggle(
+    setter: React.Dispatch<React.SetStateAction<Set<string>>>,
+    value: string,
+  ) {
+    setter((prev) => {
       const next = new Set(prev);
-      if (next.has(cat)) next.delete(cat);
-      else next.add(cat);
+      if (next.has(value)) next.delete(value);
+      else next.add(value);
       return next;
     });
   }
@@ -142,7 +201,6 @@ export default function CatalogueLotsFilter({
   return (
     <div className="flex flex-col gap-12 sm:gap-20">
       <div className="bg-lime/5 border border-sapin rounded-2xl shadow-[4px_4px_0_0_#06573F] overflow-hidden">
-
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -163,14 +221,15 @@ export default function CatalogueLotsFilter({
           />
         </button>
 
-        <p className="sm:text-lg text-base px-6 pb-6 text-sapin leading-relaxed">{description}</p>
+        <p className="sm:text-lg text-base px-6 pb-6 text-sapin leading-relaxed">
+          {description}
+        </p>
 
         <div
           className={`grid transition-all duration-300 ease-in-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
         >
           <div className="overflow-hidden">
             <div className="px-6 pb-6 flex flex-col gap-6">
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
                 <div className="relative">
                   <FilterPart
@@ -199,7 +258,6 @@ export default function CatalogueLotsFilter({
                     )}
                   </FilterPart>
                 </div>
-
                 <FilterPart
                   icon={<Calendar size={20} />}
                   title={dateTitle}
@@ -215,9 +273,10 @@ export default function CatalogueLotsFilter({
                 </FilterPart>
               </div>
 
-              {categories.length > 0 && (
-                <>
-                  <div className="h-px bg-sapin/10" />
+              <div className="h-px bg-sapin/10" />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
+                {categories.length > 0 && (
                   <FilterPart
                     icon={<Tag size={20} />}
                     title="Par catégorie"
@@ -225,45 +284,35 @@ export default function CatalogueLotsFilter({
                     isActive={isCategoryFiltered}
                   >
                     <div className="flex flex-wrap gap-2">
-                      {categories.map((cat) => {
-                        const checked = selectedCategories.has(cat);
-                        return (
-                          <button
-                            key={cat}
-                            type="button"
-                            onClick={() => toggleCategory(cat)}
-                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold transition-all duration-150 ${checked
-                              ? "bg-sapin text-lime border-sapin"
-                              : "bg-lime/20 text-sapin/60 border-sapin/20 hover:border-sapin/50 hover:text-sapin hover:bg-lime/40"
-                              }`}
-                          >
-                            <span
-                              className={`w-3.5 h-3.5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-colors ${checked
-                                ? "bg-lime border-lime"
-                                : "border-current opacity-50"
-                                }`}
-                            >
-                              {checked && (
-                                <svg viewBox="0 0 10 8" className="w-2 h-2">
-                                  <path
-                                    d="M1 4l3 3 5-6"
-                                    stroke="#06573F"
-                                    strokeWidth="1.8"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              )}
-                            </span>
-                            {cat}
-                          </button>
-                        );
-                      })}
+                      {categories.map((cat) => (
+                        <PillButton
+                          key={cat}
+                          label={cat}
+                          checked={selectedCategories.has(cat)}
+                          onClick={() => toggle(setSelectedCategories, cat)}
+                        />
+                      ))}
                     </div>
                   </FilterPart>
-                </>
-              )}
+                )}
+                <FilterPart
+                  icon={<Clock size={20} />}
+                  title="Par jour de récupération"
+                  subtitle="Affichez les lots disponibles certains jours de la semaine."
+                  isActive={isDayFiltered}
+                >
+                  <div className="flex flex-wrap gap-2">
+                    {JOURS.map((jour) => (
+                      <PillButton
+                        key={jour}
+                        label={JOURS_SHORT[jour]}
+                        checked={selectedDays.has(jour)}
+                        onClick={() => toggle(setSelectedDays, jour)}
+                      />
+                    ))}
+                  </div>
+                </FilterPart>
+              </div>
             </div>
           </div>
         </div>
