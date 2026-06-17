@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 
@@ -41,5 +42,6 @@ export async function supprimerLot(id: number): Promise<void> {
     );
   }
   await deleteQuery;
+  revalidateTag("lots", "max");
   redirect("/lots");
 }

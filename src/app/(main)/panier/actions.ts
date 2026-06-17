@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import { revalidateTag } from "next/cache";
 import { Resend } from "resend";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
@@ -176,21 +178,34 @@ export async function reserverLots(
     };
   }
 
-  const emailErrors: string[] = [];
+  await admin.from("lot").update({ statut: false }).in("id_lot", lotIds);
+  revalidateTag("lots", "max");
 
-  const assocLotsHtml = merchantGroups
-    .map(({ lots: groupLots, code, creneauIso }) => {
-      const creneauLabel = formatCreneau(creneauIso);
-      const lotsRows = groupLots
-        .map((lot) => {
-          const dlcLabel = lot.dlc
-            ? new Date(lot.dlc).toLocaleDateString("fr-FR", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              })
-            : null;
-          return `
+  const merchantCodes = merchantGroups.map(
+    ({ id_commercant, lots: groupLots, code, creneauIso }) => ({
+      id_commercant,
+      name_entreprise: groupLots[0].name_entreprise,
+      adresse_recup: groupLots[0].adresse_recup,
+      lots: groupLots.map((l) => ({ id_lot: l.id_lot, nature: l.nature })),
+      code,
+      creneau: formatCreneau(creneauIso),
+    }),
+  );
+
+  after(async () => {
+    const assocLotsHtml = merchantGroups
+      .map(({ lots: groupLots, code, creneauIso }) => {
+        const creneauLabel = formatCreneau(creneauIso);
+        const lotsRows = groupLots
+          .map((lot) => {
+            const dlcLabel = lot.dlc
+              ? new Date(lot.dlc).toLocaleDateString("fr-FR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : null;
+            return `
           <tr style="background:#fff;">
             <td colspan="2" style="padding:14px 14px 4px;border-top:1px solid #e5e7eb;">
               <span style="font-weight:bold;color:#06573f;font-size:15px;">${esc(lot.nature)}</span>
@@ -207,9 +222,9 @@ export async function reserverLots(
           </tr>
           ${dlcLabel ? `<tr style="background:#fff;"><td colspan="2" style="padding:2px 14px;color:#374151;font-size:13px;"><strong>DLC :</strong> ${dlcLabel}</td></tr>` : ""}
           ${lot.instructions ? `<tr style="background:#fff;"><td colspan="2" style="padding:2px 14px 8px;color:#374151;font-size:13px;"><strong>Instructions :</strong> ${esc(lot.instructions)}</td></tr>` : ""}`;
-        })
-        .join("");
-      return `
+          })
+          .join("");
+        return `
         <tr style="background:#f0fdf4;">
           <td colspan="2" style="padding:12px 14px 4px;">
             <p style="margin:0;font-weight:bold;color:#06573f;font-size:13px;">Créneau : ${esc(creneauLabel)}</p>
@@ -222,14 +237,15 @@ export async function reserverLots(
             <span style="font-weight:bold;letter-spacing:4px;font-size:24px;color:#06573f;">${esc(code)}</span>
           </td>
         </tr>`;
-    })
-    .join("");
+      })
+      .join("");
 
-  const { error: assocEmailError } = await resend.emails.send({
-    from: "Récoltéo <onboarding@resend.dev>",
-    to: assocEmail,
-    subject: "Votre réservation est confirmée — Récoltéo",
-    html: `
+    await Promise.all([
+      resend.emails.send({
+        from: "Récoltéo <onboarding@resend.dev>",
+        to: assocEmail,
+        subject: "Votre réservation est confirmée — Récoltéo",
+        html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
         <div style="background:#06573f;padding:24px;border-radius:12px 12px 0 0;">
           <h1 style="color:#c9f242;margin:0;font-size:24px;">Réservation confirmée !</h1>
@@ -245,17 +261,8 @@ export async function reserverLots(
           <p style="margin-top:24px;color:#374151;">L'équipe <strong>Récoltéo</strong></p>
         </div>
       </div>`,
-  });
-
-  if (assocEmailError) {
-    emailErrors.push(
-      `Association (${assocEmail}) : ${assocEmailError.message}`,
-    );
-  }
-
-  await Promise.all(
-    merchantGroups.map(
-      async ({ id_commercant, lots: groupLots, creneauIso }) => {
+      }),
+      ...merchantGroups.map(async ({ id_commercant, lots: groupLots, creneauIso }) => {
         const commercant = commercantMap.get(id_commercant);
         if (!commercant?.email) return;
 
@@ -285,7 +292,7 @@ export async function reserverLots(
           })
           .join("");
 
-        const { error: commercantEmailError } = await resend.emails.send({
+        await resend.emails.send({
           from: "Récoltéo <onboarding@resend.dev>",
           to: commercant.email,
           subject: `Réservation de lot par ${esc(assoc.name_entreprise)} — Récoltéo`,
@@ -310,30 +317,9 @@ export async function reserverLots(
             </div>
           </div>`,
         });
-
-        if (commercantEmailError) {
-          emailErrors.push(
-            `Commerçant (${commercant.email}) : ${commercantEmailError.message}`,
-          );
-        }
-      },
-    ),
-  );
-
-  await admin.from("lot").update({ statut: false }).in("id_lot", lotIds);
-
-  return {
-    success: true,
-    merchantCodes: merchantGroups.map(
-      ({ id_commercant, lots: groupLots, code, creneauIso }) => ({
-        id_commercant,
-        name_entreprise: groupLots[0].name_entreprise,
-        adresse_recup: groupLots[0].adresse_recup,
-        lots: groupLots.map((l) => ({ id_lot: l.id_lot, nature: l.nature })),
-        code,
-        creneau: formatCreneau(creneauIso),
       }),
-    ),
-    ...(emailErrors.length > 0 && { emailErrors }),
-  };
+    ]);
+  });
+
+  return { success: true, merchantCodes };
 }

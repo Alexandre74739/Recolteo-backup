@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import type { Horaire } from "@/src/components/ui/cards/LotCard";
@@ -91,5 +92,6 @@ export async function modifierLot(
     return { error: "Erreur lors de la modification du lot." };
   }
 
+  revalidateTag("lots", "max");
   redirect("/lots");
 }

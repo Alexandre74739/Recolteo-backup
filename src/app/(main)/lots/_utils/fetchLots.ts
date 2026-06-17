@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cacheTag, cacheLife } from "next/cache";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { geocodeAddress } from "@/src/lib/geocode";
@@ -13,6 +14,20 @@ export type LotPageData =
   | { view: "commercant"; lots: Lot[] }
   | { view: "admin"; lots: Lot[] }
   | { view: "association"; lots: Lot[]; assoCoords: { lat: number; lng: number } | null };
+
+async function getAvailableLots(): Promise<Lot[]> {
+  "use cache";
+  cacheTag("lots");
+  cacheLife({ stale: 30, revalidate: 60 });
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("lot")
+    .select(LOT_FIELDS)
+    .eq("statut", true)
+    .order("created_at", { ascending: false })
+    .limit(500);
+  return (data ?? []) as Lot[];
+}
 
 export async function fetchLotsData(): Promise<LotPageData> {
   const supabase = await createClient();
@@ -61,12 +76,7 @@ export async function fetchLotsData(): Promise<LotPageData> {
     return { view: "commercant", lots: (lotsData ?? []) as Lot[] };
   }
 
-  const { data: lotsData } = await supabase
-    .from("lot")
-    .select(LOT_FIELDS)
-    .eq("statut", true)
-    .order("created_at", { ascending: false });
-  const lots = (lotsData ?? []) as Lot[];
+  const lots = await getAvailableLots();
 
   if (isAdmin) return { view: "admin", lots };
 

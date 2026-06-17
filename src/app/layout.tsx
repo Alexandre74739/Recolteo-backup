@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -23,66 +24,51 @@ export const metadata: Metadata = {
     "Connecte commerçants et associations pour une solidarité simple et rapide.",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+async function HeaderWithAuth() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let userInfo:
-    | { nom: string; role: "commercant" | "association" | "admin" }
-    | undefined;
+  if (!user) return <Header />;
 
-  if (user) {
-    const { data: adminRow } = await supabase
-      .from("administrateur")
-      .select("nom, prenom")
-      .maybeSingle();
+  const { data: adminRow } = await supabase
+    .from("administrateur")
+    .select("nom, prenom")
+    .maybeSingle();
 
-    if (adminRow) {
-      userInfo = { nom: `${adminRow.prenom} ${adminRow.nom}`, role: "admin" };
-    } else {
-      const { data: userRow } = await supabase
-        .from("user")
-        .select("id_user, nom")
-        .eq("auth_id", user.id)
-        .maybeSingle();
-
-      if (userRow) {
-        const [{ data: commercant }, { data: association }] = await Promise.all(
-          [
-            supabase
-              .from("commercant")
-              .select("name_entreprise")
-              .eq("id_user", userRow.id_user)
-              .maybeSingle(),
-            supabase
-              .from("association")
-              .select("name_entreprise")
-              .eq("id_user", userRow.id_user)
-              .maybeSingle(),
-          ],
-        );
-
-        if (commercant) {
-          userInfo = {
-            nom: userRow.nom ?? commercant.name_entreprise,
-            role: "commercant",
-          };
-        } else if (association) {
-          userInfo = {
-            nom: userRow.nom ?? association.name_entreprise,
-            role: "association",
-          };
-        }
-      }
-    }
+  if (adminRow) {
+    return <Header user={{ nom: `${adminRow.prenom} ${adminRow.nom}`, role: "admin" }} />;
   }
 
+  const { data: userRow } = await supabase
+    .from("user")
+    .select("id_user, nom")
+    .eq("auth_id", user.id)
+    .maybeSingle();
+
+  if (!userRow) return <Header />;
+
+  const [{ data: commercant }, { data: association }] = await Promise.all([
+    supabase.from("commercant").select("name_entreprise").eq("id_user", userRow.id_user).maybeSingle(),
+    supabase.from("association").select("name_entreprise").eq("id_user", userRow.id_user).maybeSingle(),
+  ]);
+
+  if (commercant) {
+    return <Header user={{ nom: userRow.nom ?? commercant.name_entreprise, role: "commercant" }} />;
+  }
+  if (association) {
+    return <Header user={{ nom: userRow.nom ?? association.name_entreprise, role: "association" }} />;
+  }
+
+  return <Header />;
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="fr"
@@ -90,9 +76,13 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-cream">
         <CartProvider>
-          <Header user={userInfo} />
+          <Suspense fallback={<Header />}>
+            <HeaderWithAuth />
+          </Suspense>
           {children}
-          <Footer />
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
           <CookieManager />
         </CartProvider>
       </body>

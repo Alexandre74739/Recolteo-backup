@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { generateCerfa } from "@/src/lib/cerfa";
@@ -244,68 +245,59 @@ export type CollectAdminItem = {
   } | null;
 };
 
+type CollectJoinRow = {
+  id_collect: number;
+  statut?: boolean;
+  code_retrait: string | null;
+  creneau: string | null;
+  lot: {
+    nature: string;
+    quantity: number;
+    montant_chiffre: number;
+    adresse_recup: string;
+    commercant: { name_entreprise: string; email: string; adresse: string | null } | null;
+  } | null;
+  association: { name_entreprise: string; email: string | null; tel: string | null; adresse: string | null } | null;
+};
+
+function mapCollectJoin(c: CollectJoinRow, statut: boolean): CollectAdminItem {
+  return {
+    id_collect: c.id_collect,
+    statut,
+    code_retrait: c.code_retrait ?? "",
+    creneau: c.creneau ?? "",
+    lot: c.lot
+      ? {
+          nature: c.lot.nature,
+          quantity: c.lot.quantity,
+          montant_chiffre: c.lot.montant_chiffre,
+          adresse_recup: c.lot.adresse_recup,
+        }
+      : null,
+    commercant: c.lot?.commercant ?? null,
+    association: c.association ?? null,
+  };
+}
+
+const COLLECT_JOIN = `
+  id_collect, statut, code_retrait, creneau,
+  lot:id_lot(nature, quantity, montant_chiffre, adresse_recup,
+    commercant:id_commercant(name_entreprise, email, adresse)),
+  association:id_association(name_entreprise, email, tel, adresse)
+` as const;
+
 export async function getPendingCollects(): Promise<CollectAdminItem[]> {
   await assertAdmin();
   const admin = createAdminClient();
 
-  const { data: collects } = await admin
+  const { data } = await admin
     .from("collect")
-    .select("id_collect, id_lot, id_association, code_retrait, creneau")
+    .select(COLLECT_JOIN)
     .eq("statut", false)
     .order("creneau", { ascending: true })
     .limit(ADMIN_PAGE_SIZE);
 
-  if (!collects?.length) return [];
-
-  const lotIds = [...new Set(collects.map((c) => c.id_lot))];
-  const assocIds = [...new Set(collects.map((c) => c.id_association))];
-
-  const { data: lots } = await admin
-    .from("lot")
-    .select("id_lot, id_commercant, nature, quantity, montant_chiffre, adresse_recup")
-    .in("id_lot", lotIds);
-
-  const commercantIds = [...new Set((lots ?? []).map((l) => l.id_commercant))];
-
-  const [{ data: associations }, { data: commercants }] = await Promise.all([
-    admin
-      .from("association")
-      .select("id_association, name_entreprise, email, tel, rna, adresse")
-      .in("id_association", assocIds),
-    admin
-      .from("commercant")
-      .select("id_commercant, name_entreprise, email, adresse")
-      .in("id_commercant", commercantIds),
-  ]);
-
-  const lotMap = new Map((lots ?? []).map((l) => [l.id_lot, l]));
-  const assocMap = new Map(
-    (associations ?? []).map((a) => [a.id_association, a]),
-  );
-  const commercantMap = new Map(
-    (commercants ?? []).map((c) => [c.id_commercant, c]),
-  );
-
-  return collects.map((c) => {
-    const lot = lotMap.get(c.id_lot) ?? null;
-    return {
-      id_collect: c.id_collect,
-      statut: false,
-      id_lot: c.id_lot,
-      code_retrait: c.code_retrait ?? "",
-      creneau: c.creneau ?? "",
-      lot: lot
-        ? {
-          nature: lot.nature,
-          quantity: lot.quantity,
-          montant_chiffre: lot.montant_chiffre,
-          adresse_recup: lot.adresse_recup,
-        }
-        : null,
-      commercant: lot ? (commercantMap.get(lot.id_commercant) ?? null) : null,
-      association: assocMap.get(c.id_association) ?? null,
-    };
-  });
+  return (data ?? []).map((c) => mapCollectJoin(c as unknown as CollectJoinRow, false));
 }
 
 const ADMIN_PAGE_SIZE = 200;
@@ -314,61 +306,15 @@ export async function getAllCollectsAdmin(page = 0): Promise<CollectAdminItem[]>
   await assertAdmin();
   const admin = createAdminClient();
 
-  const { data: collects } = await admin
+  const { data } = await admin
     .from("collect")
-    .select("id_collect, id_lot, id_association, code_retrait, creneau, statut")
+    .select(COLLECT_JOIN)
     .order("creneau", { ascending: false })
     .range(page * ADMIN_PAGE_SIZE, (page + 1) * ADMIN_PAGE_SIZE - 1);
 
-  if (!collects?.length) return [];
-
-  const lotIds = [...new Set(collects.map((c) => c.id_lot))];
-  const assocIds = [...new Set(collects.map((c) => c.id_association))];
-
-  const { data: lots } = await admin
-    .from("lot")
-    .select("id_lot, id_commercant, nature, quantity, montant_chiffre, adresse_recup")
-    .in("id_lot", lotIds);
-
-  const commercantIds = [...new Set((lots ?? []).map((l) => l.id_commercant))];
-
-  const [{ data: associations }, { data: commercants }] = await Promise.all([
-    admin
-      .from("association")
-      .select("id_association, name_entreprise, email, tel, rna, adresse")
-      .in("id_association", assocIds),
-    admin
-      .from("commercant")
-      .select("id_commercant, name_entreprise, email, adresse")
-      .in("id_commercant", commercantIds),
-  ]);
-
-  const lotMap = new Map((lots ?? []).map((l) => [l.id_lot, l]));
-  const assocMap = new Map(
-    (associations ?? []).map((a) => [a.id_association, a]),
-  );
-  const commercantMap = new Map(
-    (commercants ?? []).map((c) => [c.id_commercant, c]),
-  );
-
-  return collects.map((c) => {
-    const lot = lotMap.get(c.id_lot) ?? null;
-    return {
-      id_collect: c.id_collect,
-      statut: c.statut ?? false,
-      code_retrait: c.code_retrait ?? "",
-      creneau: c.creneau ?? "",
-      lot: lot
-        ? {
-          nature: lot.nature,
-          quantity: lot.quantity,
-          montant_chiffre: lot.montant_chiffre,
-          adresse_recup: lot.adresse_recup,
-        }
-        : null,
-      commercant: lot ? (commercantMap.get(lot.id_commercant) ?? null) : null,
-      association: assocMap.get(c.id_association) ?? null,
-    };
+  return (data ?? []).map((c) => {
+    const row = c as unknown as CollectJoinRow;
+    return mapCollectJoin(row, row.statut ?? false);
   });
 }
 

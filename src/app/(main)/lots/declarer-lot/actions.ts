@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import { revalidateTag } from "next/cache";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { geocodeAddress } from "@/src/lib/geocode";
@@ -105,17 +107,21 @@ export async function importerLots(
     return { error: "Erreur lors de l'import des lots." };
   }
 
-  const BATCH_SIZE = 10;
-  for (let i = 0; i < inserted.length; i += BATCH_SIZE) {
-    await Promise.all(
-      inserted.slice(i, i + BATCH_SIZE).map(async (lot) => {
-        const coords = await geocodeAddress(lot.adresse_recup);
-        if (coords) {
-          await admin.from("lot").update({ lat: coords.lat, lng: coords.lng }).eq("id_lot", lot.id_lot);
-        }
-      }),
-    );
-  }
+  revalidateTag("lots", "max");
+
+  after(async () => {
+    const BATCH_SIZE = 10;
+    for (let i = 0; i < inserted.length; i += BATCH_SIZE) {
+      await Promise.all(
+        inserted.slice(i, i + BATCH_SIZE).map(async (lot) => {
+          const coords = await geocodeAddress(lot.adresse_recup);
+          if (coords) {
+            await admin.from("lot").update({ lat: coords.lat, lng: coords.lng }).eq("id_lot", lot.id_lot);
+          }
+        }),
+      );
+    }
+  });
 
   return {};
 }
@@ -209,13 +215,17 @@ export async function declarerLot(
     return { error: "Erreur lors de la déclaration du lot." };
   }
 
-  const coords = await geocodeAddress(adresse_recup);
-  if (coords) {
-    await admin
-      .from("lot")
-      .update({ lat: coords.lat, lng: coords.lng })
-      .eq("id_lot", inserted.id_lot);
-  }
+  revalidateTag("lots", "max");
+
+  after(async () => {
+    const coords = await geocodeAddress(adresse_recup);
+    if (coords) {
+      await admin
+        .from("lot")
+        .update({ lat: coords.lat, lng: coords.lng })
+        .eq("id_lot", inserted.id_lot);
+    }
+  });
 
   redirect("/lots");
 }

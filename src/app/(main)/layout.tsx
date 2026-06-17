@@ -1,12 +1,9 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
 import PendingValidationModal from "@/src/components/ui/modals/PendingValidationModal";
 
-export default async function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+async function AuthGate({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,20 +32,12 @@ export default async function MainLayout({
     );
   }
 
-  const { data: commercant } = await supabase
-    .from("commercant")
-    .select("is_validated")
-    .eq("id_user", userRow.id_user)
-    .maybeSingle();
+  const [{ data: commercant }, { data: association }] = await Promise.all([
+    supabase.from("commercant").select("is_validated").eq("id_user", userRow.id_user).maybeSingle(),
+    supabase.from("association").select("is_validated").eq("id_user", userRow.id_user).maybeSingle(),
+  ]);
 
-  const { data: association } = await supabase
-    .from("association")
-    .select("is_validated")
-    .eq("id_user", userRow.id_user)
-    .maybeSingle();
-
-  const entity = commercant ?? association;
-  const isValidated = entity?.is_validated === true;
+  const isValidated = (commercant ?? association)?.is_validated === true;
 
   if (!isValidated) {
     return (
@@ -59,4 +48,12 @@ export default async function MainLayout({
   }
 
   return <>{children}</>;
+}
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense>
+      <AuthGate>{children}</AuthGate>
+    </Suspense>
+  );
 }
