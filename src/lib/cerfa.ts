@@ -120,7 +120,7 @@ export async function generateCerfa(data: CerfaData): Promise<Buffer> {
   page.drawRectangle({ x: 348, y: 148, width: 185, height: 52, borderColor: SAPIN, borderWidth: 0.5, borderOpacity: 0.25, color: rgb(0.93, 0.96, 0.95) });
   page.drawText(commercant.name_entreprise.substring(0, 26), { x: 355, y: 183, size: 9,   font,  color: SAPIN });
   page.drawText("Signé électroniquement via Récoltéo",       { x: 355, y: 170, size: 6.5, font,  color: rgb(0.45, 0.45, 0.45) });
-  page.drawText(`Le ${dateCollect}`,                         { x: 355, y: 158, size: 6.5, bold,  color: rgb(0.45, 0.45, 0.45) });
+  page.drawText(`Le ${dateCollect}`,                         { x: 355, y: 158, size: 6.5, font: bold, color: rgb(0.45, 0.45, 0.45) });
 
   const pdfBytes = await pdf.save();
   return Buffer.from(pdfBytes);
