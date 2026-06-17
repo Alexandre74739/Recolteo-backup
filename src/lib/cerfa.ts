@@ -110,14 +110,17 @@ export async function generateCerfa(data: CerfaData): Promise<Buffer> {
   form.getTextField("b21").setText(dateCollect);
   form.getTextField("b27").setText(dateCollect);
 
-  const font = await pdf.embedFont(StandardFonts.HelveticaOblique);
-  const page = pdf.getPages()[0];
-  const sigText = commercant.name_entreprise;
-  const sigNote = "Signé électroniquement";
-  page.drawText(sigText, { x: 352, y: 168, size: 9, font, color: rgb(0.04, 0.34, 0.25) });
-  page.drawText(sigNote, { x: 352, y: 156, size: 7, font, color: rgb(0.45, 0.45, 0.45) });
-
   form.flatten();
+
+  const font = await pdf.embedFont(StandardFonts.HelveticaOblique);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const page = pdf.getPages()[0];
+  const SAPIN = rgb(0.024, 0.341, 0.247);
+
+  page.drawRectangle({ x: 348, y: 148, width: 185, height: 52, borderColor: SAPIN, borderWidth: 0.5, borderOpacity: 0.25, color: rgb(0.93, 0.96, 0.95) });
+  page.drawText(commercant.name_entreprise.substring(0, 26), { x: 355, y: 183, size: 9,   font,  color: SAPIN });
+  page.drawText("Signé électroniquement via Récoltéo",       { x: 355, y: 170, size: 6.5, font,  color: rgb(0.45, 0.45, 0.45) });
+  page.drawText(`Le ${dateCollect}`,                         { x: 355, y: 158, size: 6.5, bold,  color: rgb(0.45, 0.45, 0.45) });
 
   const pdfBytes = await pdf.save();
   return Buffer.from(pdfBytes);

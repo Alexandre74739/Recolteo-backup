@@ -235,6 +235,7 @@ export async function rejectProfile(formData: FormData) {
 
 export type CollectAdminItem = {
   id_collect: number;
+  id_lot: number;
   statut: boolean;
   code_retrait: string;
   creneau: string;
@@ -259,6 +260,7 @@ export type CollectAdminItem = {
 
 type CollectJoinRow = {
   id_collect: number;
+  id_lot: number;
   statut?: boolean;
   code_retrait: string | null;
   creneau: string | null;
@@ -284,6 +286,7 @@ type CollectJoinRow = {
 function mapCollectJoin(c: CollectJoinRow, statut: boolean): CollectAdminItem {
   return {
     id_collect: c.id_collect,
+    id_lot: c.id_lot,
     statut,
     code_retrait: c.code_retrait ?? "",
     creneau: c.creneau ?? "",
@@ -301,7 +304,7 @@ function mapCollectJoin(c: CollectJoinRow, statut: boolean): CollectAdminItem {
 }
 
 const COLLECT_JOIN = `
-  id_collect, statut, code_retrait, creneau,
+  id_collect, id_lot, statut, code_retrait, creneau,
   lot:id_lot(nature, quantity, montant_chiffre, adresse_recup,
     commercant:id_commercant(name_entreprise, email, adresse)),
   association:id_association(name_entreprise, email, tel, adresse)
