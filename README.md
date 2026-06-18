@@ -4,7 +4,20 @@ Mise en relation commerçants / associations pour les dons alimentaires. Déclar
 
 ## Stack
 
-Next.js App Router · TypeScript · Supabase (Auth + PostgreSQL + Storage) · Tailwind v4 · Motion · Resend · pdf-lib · xlsx · API BAN
+| Couche | Techno |
+|--------|--------|
+| Framework | Next.js 16 App Router + React 19 |
+| Langage | TypeScript 5 |
+| Styles | Tailwind CSS v4 |
+| Backend / Auth | Supabase (Auth · PostgreSQL · Storage) |
+| Paiement | Stripe (abonnements + webhooks) |
+| Emails | Resend |
+| Animations | Motion (Framer Motion v12) |
+| PDF | pdf-lib |
+| Export Excel | xlsx |
+| Géocodage | API BAN (adresses françaises) |
+| Icons | @deemlol/next-icons |
+| Qualité | ESLint + Husky |
 
 ## Install
 
@@ -18,11 +31,23 @@ npm run dev
 
 ```
 src/
-├── app/          # Routes Next.js (voir src/app/README.md)
-├── components/   # Composants partagés (voir src/components/README.md)
-├── lib/          # Logique métier, clients Supabase (voir src/lib/README.md)
-└── asset/        # Images, SVG, template CERFA.pdf
-middleware.ts     # Auth + rate limiting (10 req/15min/IP)
+├── app/
+│   ├── (main)/       # Routes authentifiées
+│   │   ├── lots/         # Déclaration et gestion des lots
+│   │   ├── panier/       # Réservation des lots
+│   │   ├── profil/       # Profil utilisateur
+│   │   ├── historique-export/  # Historique des exports
+│   │   ├── admin/        # Backoffice (collectes, structures, validation)
+│   │   └── stripe/       # Gestion abonnement
+│   ├── (public)/     # Pages publiques (landing, auth)
+│   └── api/          # Route handlers (cerfa, export, stripe webhooks…)
+├── components/       # Composants UI partagés
+├── lib/              # Logique métier
+│   ├── supabase/         # Clients Supabase (browser / server / admin)
+│   ├── server/           # Helpers server-only (crypto, emails…)
+│   └── data/             # Fetchers de données
+└── asset/            # Images, SVG, template CERFA.pdf
+middleware.ts         # Auth + rate limiting (10 req/15 min/IP)
 ```
 
 ## Règles importantes
