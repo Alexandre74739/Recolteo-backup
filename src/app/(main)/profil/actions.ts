@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { generateCerfa } from "@/src/lib/cerfa";
+import { hashPdf, getTimestampToken } from "@/src/lib/timestamp";
 import { stripe, COMMISSION_RATE, ASSOCIATION_ANNUAL_PRICE_ID } from "@/src/lib/stripe";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -274,6 +276,7 @@ export async function validerCollect(
   }
 
   if (pdfBuffer) {
+    const pdfHash = hashPdf(pdfBuffer);
     const storagePath = `${commercant.id_commercant}/${collect.id_collect}.pdf`;
     const { error: uploadError } = await admin.storage
       .from("cerfas")
@@ -285,8 +288,14 @@ export async function validerCollect(
     if (!uploadError) {
       await admin
         .from("document_fiscal")
-        .update({ pdf: storagePath })
+        .update({ pdf: storagePath, pdf_hash: pdfHash })
         .eq("id_collect", collect.id_collect);
+      const idCollect = collect.id_collect;
+      after(async () => {
+        const token = await getTimestampToken(pdfHash);
+        if (token)
+          await admin.from("document_fiscal").update({ timestamp_token: token }).eq("id_collect", idCollect);
+      });
     } else {
       console.error("Erreur upload CERFA :", uploadError);
     }
@@ -492,6 +501,7 @@ export async function validerCollectsParCode(code: string): Promise<ValiderResul
     }
 
     if (pdfBuffer) {
+      const pdfHash = hashPdf(pdfBuffer);
       const storagePath = `${commercant.id_commercant}/${collect.id_collect}.pdf`;
       const { error: uploadError } = await admin.storage
         .from("cerfas")
@@ -499,8 +509,14 @@ export async function validerCollectsParCode(code: string): Promise<ValiderResul
       if (!uploadError) {
         await admin
           .from("document_fiscal")
-          .update({ pdf: storagePath })
+          .update({ pdf: storagePath, pdf_hash: pdfHash })
           .eq("id_collect", collect.id_collect);
+        const idCollect = collect.id_collect;
+        after(async () => {
+          const token = await getTimestampToken(pdfHash);
+          if (token)
+            await admin.from("document_fiscal").update({ timestamp_token: token }).eq("id_collect", idCollect);
+        });
       }
     }
   }

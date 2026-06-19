@@ -5,6 +5,7 @@ import { after } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { generateCerfa } from "@/src/lib/cerfa";
+import { hashPdf, getTimestampToken } from "@/src/lib/timestamp";
 import { assertAdmin } from "./_utils/fetchAdmin";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -115,7 +116,7 @@ export async function validateProfile(formData: FormData) {
   if (type === "commercant") {
     const { data } = await admin
       .from("commercant")
-      .select("name_entreprise, id_user")
+      .select("name_entreprise, id_user, email")
       .eq("id_commercant", id)
       .maybeSingle();
     await admin
@@ -137,11 +138,35 @@ export async function validateProfile(formData: FormData) {
         "commercant",
         data.name_entreprise,
       );
+      if (data.email) {
+        resend.emails.send({
+          from: "Récoltéo <onboarding@resend.dev>",
+          to: data.email,
+          subject: "Votre profil Récoltéo est validé !",
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+              <div style="background:#06573f;padding:24px;border-radius:12px 12px 0 0;">
+                <h1 style="color:#c9f242;margin:0;font-size:24px;">Profil validé !</h1>
+              </div>
+              <div style="background:#f9fafb;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none;">
+                <p style="color:#374151;">Bonjour <strong>${data.name_entreprise}</strong>,</p>
+                <p style="color:#374151;">Bonne nouvelle ! Votre profil commerçant a été vérifié et validé par l'équipe Récoltéo.</p>
+                <p style="color:#374151;">Vous pouvez dès maintenant vous connecter et déclarer vos premiers lots d'invendus.</p>
+                <div style="margin-top:24px;">
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}" style="background:#06573f;color:#c9f242;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
+                    Accéder à mon espace →
+                  </a>
+                </div>
+                <p style="margin-top:24px;color:#374151;">L'équipe <strong>Récoltéo</strong></p>
+              </div>
+            </div>`,
+        }).catch(() => {});
+      }
     }
   } else {
     const { data } = await admin
       .from("association")
-      .select("name_entreprise, id_user")
+      .select("name_entreprise, id_user, email")
       .eq("id_association", id)
       .maybeSingle();
     await admin
@@ -163,6 +188,30 @@ export async function validateProfile(formData: FormData) {
         "association",
         data.name_entreprise,
       );
+      if (data.email) {
+        resend.emails.send({
+          from: "Récoltéo <onboarding@resend.dev>",
+          to: data.email,
+          subject: "Votre profil Récoltéo est validé !",
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+              <div style="background:#06573f;padding:24px;border-radius:12px 12px 0 0;">
+                <h1 style="color:#c9f242;margin:0;font-size:24px;">Profil validé !</h1>
+              </div>
+              <div style="background:#f9fafb;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none;">
+                <p style="color:#374151;">Bonjour <strong>${data.name_entreprise}</strong>,</p>
+                <p style="color:#374151;">Bonne nouvelle ! Votre profil association a été vérifié et validé par l'équipe Récoltéo.</p>
+                <p style="color:#374151;">Vous pouvez dès maintenant accéder aux lots disponibles et effectuer vos premières réservations.</p>
+                <div style="margin-top:24px;">
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}" style="background:#06573f;color:#c9f242;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
+                    Accéder à mon espace →
+                  </a>
+                </div>
+                <p style="margin-top:24px;color:#374151;">L'équipe <strong>Récoltéo</strong></p>
+              </div>
+            </div>`,
+        }).catch(() => {});
+      }
     }
   }
 
@@ -481,6 +530,7 @@ export async function validerCollectAdmin(
     }
 
     if (pdfBuffer) {
+      const pdfHash = hashPdf(pdfBuffer);
       const storagePath = `${commercant.id_commercant}/${collect.id_collect}.pdf`;
       const { error: uploadError } = await admin.storage
         .from("cerfas")
@@ -491,8 +541,11 @@ export async function validerCollectAdmin(
       if (!uploadError) {
         await admin
           .from("document_fiscal")
-          .update({ pdf: storagePath })
+          .update({ pdf: storagePath, pdf_hash: pdfHash })
           .eq("id_collect", collect.id_collect);
+        const token = await getTimestampToken(pdfHash);
+        if (token)
+          await admin.from("document_fiscal").update({ timestamp_token: token }).eq("id_collect", collect.id_collect);
       }
     }
 

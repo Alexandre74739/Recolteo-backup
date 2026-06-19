@@ -31,7 +31,7 @@ export async function GET(_req: NextRequest) {
 
   const [{ data: lots }, { data: collects }] = await Promise.all([
     commercant?.id_commercant
-      ? admin.from("lot").select("nature, category, quantity, montant_chiffre, montant_lettre, adresse_recup, date_mise_en_ligne, statut").eq("id_commercant", commercant.id_commercant)
+      ? admin.from("lot").select("nature, category, quantity, montant_chiffre, montant_lettre, adresse_recup, created_at, statut").eq("id_commercant", commercant.id_commercant)
       : Promise.resolve({ data: [] }),
     association?.id_association
       ? admin.from("collect").select("date, creneau, statut").eq("id_association", association.id_association)

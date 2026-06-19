@@ -113,14 +113,11 @@ export async function generateCerfa(data: CerfaData): Promise<Buffer> {
   form.flatten();
 
   const font = await pdf.embedFont(StandardFonts.HelveticaOblique);
-  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const page = pdf.getPages()[0];
+  const page2 = pdf.getPages()[1];
   const SAPIN = rgb(0.024, 0.341, 0.247);
 
-  page.drawRectangle({ x: 348, y: 148, width: 185, height: 52, borderColor: SAPIN, borderWidth: 0.5, borderOpacity: 0.25, color: rgb(0.93, 0.96, 0.95) });
-  page.drawText(commercant.name_entreprise.substring(0, 26), { x: 355, y: 183, size: 9,   font,  color: SAPIN });
-  page.drawText("Signé électroniquement via Récoltéo",       { x: 355, y: 170, size: 6.5, font,  color: rgb(0.45, 0.45, 0.45) });
-  page.drawText(`Le ${dateCollect}`,                         { x: 355, y: 158, size: 6.5, font: bold, color: rgb(0.45, 0.45, 0.45) });
+  page2.drawText(commercant.name_entreprise.substring(0, 30), { x: 350, y: 193, size: 9,   font, color: SAPIN });
+  page2.drawText("Signé électroniquement via Récoltéo",        { x: 350, y: 179, size: 6.5, font, color: rgb(0.45, 0.45, 0.45) });
 
   const pdfBytes = await pdf.save();
   return Buffer.from(pdfBytes);

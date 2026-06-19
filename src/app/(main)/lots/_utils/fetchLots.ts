@@ -19,11 +19,13 @@ async function getAvailableLots(): Promise<Lot[]> {
   "use cache";
   cacheTag("lots");
   cacheLife({ stale: 30, revalidate: 60 });
+  const today = new Date().toISOString().split("T")[0];
   const admin = createAdminClient();
   const { data } = await admin
     .from("lot")
     .select(LOT_FIELDS)
     .eq("statut", true)
+    .or(`dlc.is.null,dlc.gte.${today}`)
     .order("created_at", { ascending: false })
     .limit(500);
   return (data ?? []) as Lot[];
