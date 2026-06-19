@@ -5,7 +5,6 @@ import { UserX, Shield } from "@deemlol/next-icons";
 import { signOut } from "@/src/app/(public)/login/actions";
 import Button from "@/src/components/ui/primitives/Button";
 import TabToggle from "@/src/components/ui/primitives/TabToggle";
-import ValueCard from "@/src/components/ui/cards/ValueCard";
 import Reveal from "@/src/components/animations/Reveal";
 import ProfilHeader from "./ProfilHeader";
 import InfoTab, { type EntityInfo } from "./tabs/InfoTab";
@@ -15,6 +14,7 @@ import CollectesTab from "./tabs/CollectesTab";
 import HistoriqueMembreTab from "./tabs/HistoriqueMembreTab";
 import HistoriqueAdminTab from "./tabs/HistoriqueAdminTab";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import ValueCard from "@/src/components/ui/cards/ValueCard";
 
 type Tab = "info" | "docs" | "collectes" | "historique" | "securite";
 

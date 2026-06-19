@@ -22,8 +22,8 @@ export default function MentionsLegales() {
             <p><strong>Téléphone :</strong> 06 50 00 53 42</p>
             <p>
               <strong>Email :</strong>{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin/70 transition-colors">
+                contact@recolteo.fr
               </a>
             </p>
             <p><strong>Directeur de publication :</strong> Lucie Curtatone</p>
@@ -209,8 +209,8 @@ export default function MentionsLegales() {
               Nous vous recommandons de choisir un mot de passe robuste et de le modifier sans délai en cas
               de suspicion d'utilisation frauduleuse. En cas d'utilisation frauduleuse, contactez-nous
               immédiatement à{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin/70 transition-colors">
+                contact@recolteo.fr
               </a>.
             </p>
           </div>

@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { ChevronDown } from "@deemlol/next-icons";
+import { ChevronDown, Euro } from "@deemlol/next-icons";
 import LoadingSpinner from "@/src/components/ui/primitives/LoadingSpinner";
 import { fetchSetupIntentSecret } from "../../_hooks/useStripeSetup";
 import { getCommercantPaymentMethod, saveCommercantPaymentMethod } from "../../actions";
 import type { PaymentMethodInfo } from "../../actions";
-import SubscriptionPricingCard from "@/src/components/ui/cards/SubscriptionPricingCard";
+import ValueCard from "@/src/components/ui/cards/ValueCard";
 
 const StripePaymentSetup = dynamic(() => import("../StripePaymentSetup"), { ssr: false });
 
@@ -82,11 +82,10 @@ export default function PaiementCommercantTab() {
               <LoadingSpinner />
             ) : clientSecret ? (
               <>
-                <SubscriptionPricingCard
-                  title="Commission par collecte"
-                  price={10}
-                  unit="%"
-                  description="Prélevée automatiquement à chaque validation de collecte."
+                <ValueCard
+                  icon={<Euro size={20} />}
+                  title="Facilitez vos moyens de paiement"
+                  description="Bénéficiez d'une exonération² de 50% sur vos impôts"
                 />
                 <StripePaymentSetup
                   clientSecret={clientSecret}

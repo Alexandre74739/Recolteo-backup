@@ -25,8 +25,8 @@ export default function PolitiqueDeConfidentialite() {
             <p><strong>Adresse :</strong> 6 rue du Bac, 38190 Villard Bonnot</p>
             <p>
               <strong>Email :</strong>{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin transition-colors">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin transition-colors">
+                contact@recolteo.fr
               </a>
             </p>
           </div>
@@ -283,8 +283,8 @@ export default function PolitiqueDeConfidentialite() {
             </p>
             <p className="text-sapin/70">
               En cas de litige ou d'anomalie de facturation, contactez-nous à{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin/70 transition-colors">
+                contact@recolteo.fr
               </a>.
             </p>
           </div>
@@ -309,8 +309,8 @@ export default function PolitiqueDeConfidentialite() {
           <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80">
             <p className="mb-2">
               Pour exercer vos droits, contactez-nous à :{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors font-semibold">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin/70 transition-colors font-semibold">
+                contact@recolteo.fr
               </a>
             </p>
             <p className="text-sapin/60 text-xs">
@@ -342,8 +342,8 @@ export default function PolitiqueDeConfidentialite() {
             <p><strong>Adresse :</strong> 6 rue du Bac, 38190 Villard Bonnot</p>
             <p>
               <strong>Email :</strong>{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin/70 transition-colors">
+                contact@recolteo.fr
               </a>
             </p>
           </div>
