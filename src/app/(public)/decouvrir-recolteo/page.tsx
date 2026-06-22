@@ -4,7 +4,7 @@ import Hero from "@/src/components/sections/Hero";
 import About from "@/src/components/sections/About";
 import VideoDemo from "@/src/components/sections/VideoDemo";
 import Faq from "@/src/components/sections/Faq";
-import Leo from "../../../components/ui/modals/Leo";
+import Teo from "../../../components/ui/modals/Teo";
 
 const LEO_STEPS = [
   { message: "Ici, tout ce qu'il faut savoir sur Récoltéo : mission, valeurs, et pourquoi on fait ça !" },
@@ -31,7 +31,7 @@ export default function DecouvrirRecolteo() {
       <About />
       <VideoDemo />
       <Faq />
-      <Leo storageKey="leo-decouvrir" steps={LEO_STEPS} />
+      <Teo storageKey="leo-decouvrir" steps={LEO_STEPS} />
     </main>
   );
 }

@@ -3,7 +3,7 @@
 import Hero from "@/src/components/sections/Hero";
 import Categories from "@/src/components/sections/Categories";
 import HowItWorks from "@/src/components/sections/HowItWorks";
-import Leo from "../../components/ui/modals/Leo";
+import Teo from "../../components/ui/modals/Teo";
 
 const LEO_STEPS = [
   { message: "Bienvenue sur Récoltéo ! Ici, commerçants et associations de votre région échangent simplement." },
@@ -28,7 +28,7 @@ export default function Home() {
       />
       <Categories />
       <HowItWorks />
-      <Leo storageKey="leo-home" steps={LEO_STEPS} />
+      <Teo storageKey="leo-home" steps={LEO_STEPS} />
 
     </main>
   );

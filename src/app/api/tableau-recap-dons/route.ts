@@ -1,5 +1,4 @@
 import "server-only";
-import type { NextRequest } from "next/server";
 import { PDFDocument } from "pdf-lib";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
@@ -35,7 +34,7 @@ type CollectRow = {
   doc: { pdf: string | null; numero_sequentiel: string } | null;
 };
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Non authentifié", { status: 401 });
@@ -177,15 +176,13 @@ export async function GET(_req: NextRequest) {
     await appendPdf(merged, new Uint8Array(recapBuf));
   }
 
-  if (merged.getPageCount() === 0) return new Response("Aucun document généré", { status: 500 });
-
   const mergedBytes = await merged.save();
   const date = new Date().toISOString().slice(0, 10);
 
   return new Response(new Uint8Array(mergedBytes), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="historique-recolteo-${date}.pdf"`,
+      "Content-Disposition": `attachment; filename="tableau-recap-dons-${date}.pdf"`,
       "Cache-Control": "no-store",
     },
   });
