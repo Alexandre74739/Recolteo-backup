@@ -4,6 +4,8 @@ import { useState, useTransition, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { ChevronDown } from "@deemlol/next-icons";
 import LoadingSpinner from "@/src/components/ui/primitives/LoadingSpinner";
+import Button from "@/src/components/ui/primitives/Button";
+import ConfirmCancelSubscriptionModal from "@/src/components/ui/modals/ConfirmCancelSubscriptionModal";
 import {
   fetchSetupIntentSecret,
   activateSubscription,
@@ -32,7 +34,7 @@ export default function AbonnementSection() {
   const [info, setInfo] = useState<SubscriptionInfo | null>(null);
   const [fetchCount, setFetchCount] = useState(0);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [cancelPending, startCancel] = useTransition();
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [reactivatePending, startReactivate] = useTransition();
 
   const reload = useCallback(() => {
@@ -148,19 +150,12 @@ export default function AbonnementSection() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      startCancel(async () => {
-                        await requestCancelSubscription();
-                        reload();
-                      })
-                    }
-                    disabled={cancelPending}
-                    className="text-sm text-sapin/40 hover:text-sapin/70 transition-colors underline underline-offset-2 text-left w-fit"
-                  >
-                    {cancelPending ? "En cours…" : "Résilier à l'échéance"}
-                  </button>
+                  <Button
+                    label="Résilier mon abonnement"
+                    onClick={() => setShowCancelModal(true)}
+                    variant="peach-outline"
+                    showArrow={false}
+                  />
                 )}
               </>
             ) : clientSecret ? (
@@ -194,6 +189,16 @@ export default function AbonnementSection() {
           </div>
         </div>
       </div>
+      <ConfirmCancelSubscriptionModal
+        isOpen={showCancelModal}
+        periodEnd={periodEnd}
+        onConfirm={async () => {
+          await requestCancelSubscription();
+          setShowCancelModal(false);
+          reload();
+        }}
+        onCancel={() => setShowCancelModal(false)}
+      />
     </>
   );
 }
