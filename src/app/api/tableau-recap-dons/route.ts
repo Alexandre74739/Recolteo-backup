@@ -5,18 +5,12 @@ import { createAdminClient } from "@/src/lib/supabase/admin";
 import { generateTableauRecapDons, type DonRow } from "@/src/lib/tableau-recap-dons";
 import { generateCerfa } from "@/src/lib/cerfa";
 import { generateRecap } from "@/src/lib/recap";
+import { formatCreneauParis as formatCreneau } from "@/src/lib/paris-time";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-function formatCreneau(iso: string) {
-  const d = new Date(iso);
-  const date = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const h1 = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  const h2 = new Date(d.getTime() + 2 * 3600_000).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  return `${date} de ${h1} à ${h2}`;
-}
 
 async function appendPdf(merged: PDFDocument, pdfBytes: Uint8Array | ArrayBuffer) {
   const src = await PDFDocument.load(pdfBytes);

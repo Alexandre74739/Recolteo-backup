@@ -14,6 +14,7 @@ import Button from "@/src/components/ui/primitives/Button";
 import Toggle from "@/src/components/ui/primitives/Toggle";
 import { reserverLots, type MerchantCode } from "../actions";
 import type { Lot, Horaire } from "@/src/components/ui/cards/LotCard";
+import { parisDateStr, toParisISOString } from "@/src/lib/paris-time";
 
 const JOURS_SEMAINE = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
@@ -217,10 +218,10 @@ export default function ReservationModal({ items, onClose, onSuccess }: Reservat
 
   const [{ minStr, maxStr }] = useState(() => {
     const today = new Date();
-    const min = today.toISOString().split("T")[0];
+    const min = parisDateStr(today);
     const max = new Date(today);
     max.setDate(max.getDate() + 14);
-    return { minStr: min, maxStr: max.toISOString().split("T")[0] };
+    return { minStr: min, maxStr: parisDateStr(max) };
   });
 
   const merchantGroups = useMemo<MerchantGroup[]>(() => {
@@ -282,14 +283,14 @@ export default function ReservationModal({ items, onClose, onSuccess }: Reservat
         const slot = groupSlots[group.id_commercant];
         if (!slot) continue;
         for (const lot of group.lots) {
-          creneaux[lot.id_lot] = `${selectedDate}T${slot}:00`;
+          creneaux[lot.id_lot] = toParisISOString(selectedDate, slot);
           lotIds.push(lot.id_lot);
         }
       } else {
         for (const lot of group.lots) {
           const slot = lotSlots[lot.id_lot];
           if (!slot) continue;
-          creneaux[lot.id_lot] = `${selectedDate}T${slot}:00`;
+          creneaux[lot.id_lot] = toParisISOString(selectedDate, slot);
           lotIds.push(lot.id_lot);
         }
       }

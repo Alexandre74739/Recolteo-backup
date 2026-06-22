@@ -6,6 +6,7 @@ import { revalidateTag } from "next/cache";
 import { Resend } from "resend";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
+import { formatCreneauParis as formatCreneau } from "@/src/lib/paris-time";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -30,26 +31,6 @@ function generateCode(): string {
   return String(Math.floor(10000000 + Math.random() * 90000000));
 }
 
-function formatCreneau(creneauIso: string): string {
-  const date = new Date(creneauIso);
-  const dateStr = date.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const heureDebut = date.toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const heureFin = new Date(
-    date.getTime() + 2 * 60 * 60 * 1000,
-  ).toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  return `${dateStr} de ${heureDebut} à ${heureFin}`;
-}
 
 function esc(s: string): string {
   return s
