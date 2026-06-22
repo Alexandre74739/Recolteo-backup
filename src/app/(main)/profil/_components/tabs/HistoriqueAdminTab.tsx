@@ -115,7 +115,11 @@ export default function HistoriqueAdminTab() {
             showArrow={false}
             className="w-full"
             onClick={() => {
-              window.location.href = "/api/historique-export";
+              const a = document.createElement("a");
+              a.href = "/api/tableau-recap-dons";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
             }}
           />
         </div>
