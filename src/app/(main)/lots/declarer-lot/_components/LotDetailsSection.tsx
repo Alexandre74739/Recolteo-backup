@@ -41,6 +41,7 @@ export default function LotDetailsSection({
             <label className="text-sm font-semibold text-sapin">
               Catégorie <span className="text-peach">*</span>
             </label>
+            <input type="hidden" name="category_select" value={categoryValue} />
             <Dropdown
               value={categoryValue}
               placeholder="Choisir une catégorie"
