@@ -2,7 +2,7 @@ import { FileText, CreditCard } from "@deemlol/next-icons";
 import Hero from "@/src/components/sections/Hero";
 import CatalogueLots from "./_components/CatalogueLots";
 import GestionLots from "@/src/components/sections/GestionLots";
-import Leo from "@/src/components/ui/modals/Leo";
+import Teo from "@/src/components/ui/modals/Teo";
 import CatalogueDecorations from "@/src/components/illustrations/CatalogueDecorations";
 import Reveal from "@/src/components/animations/Reveal";
 import EmptyState from "@/src/components/ui/primitives/EmptyState";
@@ -79,7 +79,7 @@ export default async function LotPage() {
           secondaryButtonHref="/profil"
         />
         <GestionLots lots={data.lots} />
-        <Leo storageKey="leo-lots-commercant" steps={LEO_STEPS_COMMERCANT} />
+        <Teo storageKey="leo-lots-commercant" steps={LEO_STEPS_COMMERCANT} />
       </main>
     );
   }
@@ -100,7 +100,7 @@ export default async function LotPage() {
           secondaryButtonHref="/contact"
         />
         <GestionLots lots={data.lots} adminView />
-        <Leo storageKey="leo-lots-admin" steps={LEO_STEPS_ADMIN} />
+        <Teo storageKey="leo-lots-admin" steps={LEO_STEPS_ADMIN} />
       </main>
     );
   }
@@ -137,7 +137,7 @@ export default async function LotPage() {
         filterEmptyTitle="Aucun lot ne correspond à vos filtres"
         filterEmptySubtitle="Essayez d'élargir le rayon ou de changer la période."
       />
-      <Leo storageKey="leo-lots-association" steps={LEO_STEPS_ASSOCIATION} />
+      <Teo storageKey="leo-lots-association" steps={LEO_STEPS_ASSOCIATION} />
     </main>
   );
 }

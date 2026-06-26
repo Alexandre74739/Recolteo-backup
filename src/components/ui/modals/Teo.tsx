@@ -10,15 +10,15 @@ import Reveal from "@/src/components/animations/Reveal";
 import SlideIn from "@/src/components/animations/SlideIn";
 import FadeOut from "@/src/components/animations/FadeOut";
 
-export interface LeoProps {
+export interface TeoProps {
   storageKey?: string;
   steps: { message: string }[];
 }
 
-export default function Leo({
+export default function Teo({
   storageKey = "recolteo_leo_seen_v1",
   steps,
-}: LeoProps) {
+}: TeoProps) {
   const [step, setStep] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const seen = useSyncExternalStore(
@@ -56,7 +56,7 @@ export default function Leo({
                   <div className="flex items-center justify-between mb-2">
                     <div className="inline-flex items-center gap-2 bg-sapin rounded-full px-4 py-1">
                       <span className="text-cream font-semibold text-sm tracking-wide">
-                        {"Léo"}
+                        {"Téo"}
                       </span>
                     </div>
                     <StepDots
@@ -84,16 +84,16 @@ export default function Leo({
               </div>
             </Reveal>
             <div
-              className="z-10 absolute right-2 sm:right-24 pointer-events-none"
-              style={{ bottom: "100%", marginBottom: "-44px" }}
+              className="z-10 absolute right-0 sm:right-24 pointer-events-none -mb-14 sm:-mb-26"
+              style={{ bottom: "100%" }}
             >
               <SlideIn direction="right" delay={0.3}>
                 <Image
                   src={Ecureuil}
                   alt={"écureuil Récoltéo"}
-                  width={280}
-                  height={280}
-                  className="object-contain w-28 sm:w-56"
+                  width={560}
+                  height={560}
+                  className="object-contain w-64 sm:w-md"
                 />
               </SlideIn>
             </div>

@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { ChevronDown } from "@deemlol/next-icons";
+import { ChevronDown, Euro } from "@deemlol/next-icons";
 import LoadingSpinner from "@/src/components/ui/primitives/LoadingSpinner";
 import { fetchSetupIntentSecret } from "../../_hooks/useStripeSetup";
 import { getCommercantPaymentMethod, saveCommercantPaymentMethod } from "../../actions";
 import type { PaymentMethodInfo } from "../../actions";
-import SubscriptionPricingCard from "@/src/components/ui/cards/SubscriptionPricingCard";
+import ValueCard from "@/src/components/ui/cards/ValueCard";
 
 const StripePaymentSetup = dynamic(() => import("../StripePaymentSetup"), { ssr: false });
 
@@ -31,18 +31,18 @@ export default function PaiementCommercantTab() {
     return () => { cancelled = true; };
   }, [fetchCount]);
 
+  useEffect(() => {
+    if (open && info !== null && !clientSecret) {
+      fetchSetupIntentSecret("commercant").then((s) => {
+        if (s) setClientSecret(s);
+      });
+    }
+  }, [open, info, clientSecret]);
+
   const toggle = () => {
     const savedY = window.scrollY;
-    const next = !open;
-    setOpen(next);
-    if (next && info && !info.hasPaymentMethod && !clientSecret) {
-      fetchSetupIntentSecret("commercant").then((s) => { if (s) setClientSecret(s); });
-    }
+    setOpen((prev) => !prev);
     requestAnimationFrame(() => window.scrollTo(0, savedY));
-  };
-
-  const openForm = () => {
-    fetchSetupIntentSecret("commercant").then((s) => { if (s) setClientSecret(s); });
   };
 
   const loading = info === null;
@@ -82,40 +82,20 @@ export default function PaiementCommercantTab() {
               <LoadingSpinner />
             ) : clientSecret ? (
               <>
-                <SubscriptionPricingCard
-                  title="Commission par collecte"
-                  price={10}
-                  unit="%"
-                  description="Prélevée automatiquement à chaque validation de collecte."
+                <ValueCard
+                  icon={<Euro size={20} />}
+                  title="Facilitez vos moyens de paiement"
+                  description="Bénéficiez d'une exonération de 50% sur vos impôts"
                 />
                 <StripePaymentSetup
                   clientSecret={clientSecret}
-                  submitLabel="Enregistrer"
+                  submitLabel="Enregistrer mes modifications"
                   onPaymentMethodId={async (pmId) => {
                     const r = await saveCommercantPaymentMethod(pmId);
                     return { ok: r.success, error: r.error };
                   }}
                   onSuccess={reload}
                 />
-              </>
-            ) : info?.hasPaymentMethod ? (
-              <>
-                <div className="rounded-xl border border-sapin/15 bg-sapin/5 p-4 flex flex-col gap-1">
-                  <p className="text-xs font-semibold text-sapin/50 uppercase tracking-widest">
-                    Moyen de paiement actif
-                  </p>
-                  <p className="font-bold text-sapin">
-                    {info.type === "sepa_debit" ? "Prélèvement SEPA" : "Carte bancaire"}
-                    {info.last4 ? ` •••• ${info.last4}` : ""}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={openForm}
-                  className="text-sm text-sapin/40 hover:text-sapin transition-colors underline underline-offset-2 text-left"
-                >
-                  Modifier
-                </button>
               </>
             ) : (
               <LoadingSpinner />

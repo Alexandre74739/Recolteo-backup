@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { generateCerfa } from "@/src/lib/cerfa";
+import { hashPdf, getTimestampToken } from "@/src/lib/timestamp";
 import { stripe, COMMISSION_RATE, ASSOCIATION_ANNUAL_PRICE_ID } from "@/src/lib/stripe";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -274,6 +276,7 @@ export async function validerCollect(
   }
 
   if (pdfBuffer) {
+    const pdfHash = hashPdf(pdfBuffer);
     const storagePath = `${commercant.id_commercant}/${collect.id_collect}.pdf`;
     const { error: uploadError } = await admin.storage
       .from("cerfas")
@@ -285,8 +288,14 @@ export async function validerCollect(
     if (!uploadError) {
       await admin
         .from("document_fiscal")
-        .update({ pdf: storagePath })
+        .update({ pdf: storagePath, pdf_hash: pdfHash })
         .eq("id_collect", collect.id_collect);
+      const idCollect = collect.id_collect;
+      after(async () => {
+        const token = await getTimestampToken(pdfHash);
+        if (token)
+          await admin.from("document_fiscal").update({ timestamp_token: token }).eq("id_collect", idCollect);
+      });
     } else {
       console.error("Erreur upload CERFA :", uploadError);
     }
@@ -492,6 +501,7 @@ export async function validerCollectsParCode(code: string): Promise<ValiderResul
     }
 
     if (pdfBuffer) {
+      const pdfHash = hashPdf(pdfBuffer);
       const storagePath = `${commercant.id_commercant}/${collect.id_collect}.pdf`;
       const { error: uploadError } = await admin.storage
         .from("cerfas")
@@ -499,8 +509,14 @@ export async function validerCollectsParCode(code: string): Promise<ValiderResul
       if (!uploadError) {
         await admin
           .from("document_fiscal")
-          .update({ pdf: storagePath })
+          .update({ pdf: storagePath, pdf_hash: pdfHash })
           .eq("id_collect", collect.id_collect);
+        const idCollect = collect.id_collect;
+        after(async () => {
+          const token = await getTimestampToken(pdfHash);
+          if (token)
+            await admin.from("document_fiscal").update({ timestamp_token: token }).eq("id_collect", idCollect);
+        });
       }
     }
   }
@@ -557,6 +573,8 @@ export type SubscriptionInfo = {
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   hasPaymentMethod: boolean;
+  paymentMethodType: string | null;
+  paymentMethodLast4: string | null;
   annualPrice: number | null;
 };
 
@@ -582,12 +600,17 @@ export async function getAssociationSubscription(): Promise<SubscriptionInfo> {
 
   let cancelAtPeriodEnd = false;
   let annualPrice: number | null = null;
+  let paymentMethodType: string | null = null;
+  let paymentMethodLast4: string | null = null;
 
-  const [subResult, priceResult] = await Promise.allSettled([
+  const [subResult, priceResult, pmResult] = await Promise.allSettled([
     asso.stripe_subscription_id
       ? stripe.subscriptions.retrieve(asso.stripe_subscription_id)
       : Promise.reject(),
     stripe.prices.retrieve(ASSOCIATION_ANNUAL_PRICE_ID),
+    asso.stripe_payment_method_id
+      ? stripe.paymentMethods.retrieve(asso.stripe_payment_method_id)
+      : Promise.reject(),
   ]);
 
   if (subResult.status === "fulfilled") {
@@ -596,12 +619,23 @@ export async function getAssociationSubscription(): Promise<SubscriptionInfo> {
   if (priceResult.status === "fulfilled" && priceResult.value.unit_amount) {
     annualPrice = priceResult.value.unit_amount / 100;
   }
+  if (pmResult.status === "fulfilled") {
+    paymentMethodType = pmResult.value.type;
+    paymentMethodLast4 =
+      pmResult.value.type === "card"
+        ? pmResult.value.card?.last4 ?? null
+        : pmResult.value.type === "sepa_debit"
+          ? pmResult.value.sepa_debit?.last4 ?? null
+          : null;
+  }
 
   return {
     status: asso.stripe_subscription_status ?? "none",
     currentPeriodEnd: asso.subscription_current_period_end ?? null,
     cancelAtPeriodEnd,
     hasPaymentMethod: !!asso.stripe_payment_method_id,
+    paymentMethodType,
+    paymentMethodLast4,
     annualPrice,
   };
 }

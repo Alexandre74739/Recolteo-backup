@@ -38,7 +38,7 @@ async function checkLoginRateLimit(ip: string): Promise<boolean> {
   return false;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isLoginPage = pathname.startsWith("/login");
   const isPublicPage =

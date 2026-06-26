@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -18,19 +18,21 @@ interface FormProps {
   submitLabel: string;
   onPaymentMethodId: (pmId: string) => Promise<{ ok: boolean; error?: string }>;
   onSuccess: () => void;
+  beforeSubmit?: React.ReactNode;
 }
 
-function InnerForm({ submitLabel, onPaymentMethodId, onSuccess }: FormProps) {
+function InnerForm({ submitLabel, onPaymentMethodId, onSuccess, beforeSubmit }: FormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
-  const [pending, start] = useTransition();
+  const [pending, setPending] = useState(false);
 
-  const handleSubmit = (e: { preventDefault(): void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || pending) return;
     setError(null);
-    start(async () => {
+    setPending(true);
+    try {
       const { error: confirmError, setupIntent } = await stripe.confirmSetup({
         elements,
         confirmParams: { return_url: `${window.location.origin}/profil` },
@@ -54,7 +56,11 @@ function InnerForm({ submitLabel, onPaymentMethodId, onSuccess }: FormProps) {
         return;
       }
       onSuccess();
-    });
+    } catch {
+      setError("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
@@ -71,6 +77,7 @@ function InnerForm({ submitLabel, onPaymentMethodId, onSuccess }: FormProps) {
         Remboursable sous 8 semaines auprès de votre banque.
       </p>
       {error && <p className="text-sm text-peach font-semibold">{error}</p>}
+      {beforeSubmit}
       <Button
         label={pending ? "En cours…" : submitLabel}
         type="submit"
@@ -100,3 +107,4 @@ export default function StripePaymentSetup({
     </Elements>
   );
 }
+  

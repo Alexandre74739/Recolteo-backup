@@ -3,12 +3,12 @@ import Reveal from "@/src/components/animations/Reveal";
 
 export default function PolitiqueDeConfidentialite() {
   return (
-    <main className="max-w-3xl mx-auto px-6 py-16 text-base leading-8 text-sapin">
+    <main className="max-w-3xl mx-auto px-6 py-16 text-base leading-8 text-sapin font-sans">
       <Reveal delay={0.5}>
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-sapin mb-4">
           Politique de confidentialité
         </h1>
-        <p className="text-sapin/60 text-sm mb-10">Dernière mise à jour : juin 2026</p>
+        <p className="text-sapin/60 text-base mb-10">Dernière mise à jour : juin 2026</p>
         <p className="mb-8">
           La présente politique a pour objet d'informer les utilisateurs de la plateforme Récoltéo
           sur la manière dont leurs données personnelles sont collectées, utilisées et protégées,
@@ -18,15 +18,15 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={0.65}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">1. Responsable du traitement</h2>
-          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 space-y-1 text-sm text-sapin/80">
+          <h2 className="text-2xl font-bold text-sapin mb-4">1. Responsable du traitement</h2>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 space-y-1 text-base text-sapin/80">
             <p><strong>Société :</strong> Récoltéo</p>
             <p><strong>Responsable :</strong> Lucie Curtatone</p>
             <p><strong>Adresse :</strong> 6 rue du Bac, 38190 Villard Bonnot</p>
             <p>
               <strong>Email :</strong>{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin transition-colors">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin transition-colors">
+                contact@recolteo.fr
               </a>
             </p>
           </div>
@@ -35,8 +35,8 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={0.8}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">2. Hébergement</h2>
-          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80">
+          <h2 className="text-2xl font-bold text-sapin mb-4">2. Hébergement</h2>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-base text-sapin/80">
             <p className="mb-2">
               La plateforme est hébergée par <strong>Vercel Inc.</strong> (440 N Barranca Ave #4133, Covina, CA 91723, États-Unis).
             </p>
@@ -48,19 +48,9 @@ export default function PolitiqueDeConfidentialite() {
         </section>
       </Reveal>
 
-      <Reveal delay={0.95}>
-        <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">3. Délégué à la protection des données</h2>
-          <p className="text-sm text-sapin/70">
-            Récoltéo n'est pas tenu de désigner un Délégué à la Protection des Données (DPO) au regard
-            de la nature et du volume de ses traitements.
-          </p>
-        </section>
-      </Reveal>
-
       <Reveal delay={1.1}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">4. Données collectées</h2>
+          <h2 className="text-2xl font-bold text-sapin mb-4">3. Données collectées</h2>
           <div className="space-y-3">
             {[
               {
@@ -100,7 +90,7 @@ export default function PolitiqueDeConfidentialite() {
             ].map(({ title, items }) => (
               <div key={title} className="border border-sapin/10 rounded-2xl p-5 bg-beige/40">
                 <p className="font-semibold text-sapin mb-2">{title}</p>
-                <ul className="list-disc list-inside text-sm text-sapin/70 space-y-1">
+                <ul className="list-disc list-inside text-base text-sapin/70 space-y-1">
                   {items.map((item) => <li key={item}>{item}</li>)}
                 </ul>
               </div>
@@ -111,9 +101,9 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.25}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">5. Finalités du traitement</h2>
+          <h2 className="text-2xl font-bold text-sapin mb-4">4. Finalités du traitement</h2>
           <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40">
-            <ul className="list-disc list-inside text-sm text-sapin/80 space-y-1.5">
+            <ul className="list-disc list-inside text-base text-sapin/80 space-y-1.5">
               <li>Création et gestion des comptes utilisateurs</li>
               <li>Mise en relation commerçants / associations</li>
               <li>Gestion des lots, réservations et reçus CERFA</li>
@@ -131,7 +121,7 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.4}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">6. Base légale du traitement</h2>
+          <h2 className="text-2xl font-bold text-sapin mb-4">5. Base légale du traitement</h2>
           <div className="space-y-3">
             {[
               { base: "Art. 6.1.b — Exécution du contrat", detail: "Création de compte, gestion des lots et réservations, emails transactionnels, gestion des abonnements et facturation, prélèvement des commissions sur collectes." },
@@ -140,8 +130,8 @@ export default function PolitiqueDeConfidentialite() {
               { base: "Art. 6.1.a — Consentement", detail: "Cookies optionnels, géolocalisation de l'adresse, notifications utilisateurs en cas de violation de données." },
             ].map(({ base, detail }) => (
               <div key={base} className="border border-sapin/10 rounded-2xl p-4 bg-beige/40">
-                <p className="font-semibold text-sapin text-sm">{base}</p>
-                <p className="text-sm text-sapin/70 mt-0.5">{detail}</p>
+                <p className="font-semibold text-sapin text-base">{base}</p>
+                <p className="text-base text-sapin/70 mt-0.5">{detail}</p>
               </div>
             ))}
           </div>
@@ -150,7 +140,7 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.5}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">7. Sous-traitants et prestataires</h2>
+          <h2 className="text-2xl font-bold text-sapin mb-4">6. Sous-traitants et prestataires</h2>
           <div className="space-y-3">
             {[
               { name: "Supabase", role: "Base de données et authentification", dpa: true },
@@ -161,8 +151,8 @@ export default function PolitiqueDeConfidentialite() {
             ].map(({ name, role, dpa }) => (
               <div key={name} className="border border-sapin/10 rounded-2xl p-4 bg-beige/40 flex items-start gap-3">
                 <div className="flex-1">
-                  <p className="font-semibold text-sapin text-sm">{name}</p>
-                  <p className="text-sm text-sapin/70 mt-0.5">{role}</p>
+                  <p className="font-semibold text-sapin text-base">{name}</p>
+                  <p className="text-base text-sapin/70 mt-0.5">{role}</p>
                 </div>
                 {dpa && (
                   <span className="text-xs bg-lime text-sapin font-semibold px-2 py-0.5 rounded-full shrink-0">DPA signé</span>
@@ -175,8 +165,8 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.6}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">8. Cookies et stockage local</h2>
-          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80">
+          <h2 className="text-2xl font-bold text-sapin mb-4">7. Cookies et stockage local</h2>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-base text-sapin/80">
             <p className="mb-2">
               Le site utilise des cookies nécessaires (session Supabase, préférences de consentement) ainsi que des
               cookies optionnels soumis à votre consentement : analytiques, fonctionnels, géolocalisation d'adresse.
@@ -194,9 +184,9 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.7}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">9. Durée de conservation</h2>
+          <h2 className="text-2xl font-bold text-sapin mb-4">8. Durée de conservation</h2>
           <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40">
-            <table className="w-full text-xs text-sapin/70 border-collapse">
+            <table className="w-full text-base text-sapin/70 border-collapse">
               <thead>
                 <tr className="border-b border-sapin/10">
                   <th className="text-left py-1.5 pr-4 font-semibold">Catégorie</th>
@@ -235,7 +225,7 @@ export default function PolitiqueDeConfidentialite() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-sapin/50 mt-3">
+          <p className="text-base text-sapin/50 mt-3">
             Ces durées peuvent être prolongées pour satisfaire des obligations légales ou en cas de contentieux.
             Vos données sont supprimées à votre demande, sous réserve des obligations légales applicables.
           </p>
@@ -244,8 +234,8 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.8}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">10. Sécurité des données</h2>
-          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80 space-y-2">
+          <h2 className="text-2xl font-bold text-sapin mb-4">9. Sécurité des données</h2>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-base text-sapin/80 space-y-2">
             <p>Récoltéo met en œuvre les mesures suivantes pour protéger vos données :</p>
             <ul className="list-disc list-inside space-y-1 text-sapin/70">
               <li>Chiffrement de bout en bout des communications (HTTPS/TLS)</li>
@@ -261,11 +251,11 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.95}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">11. Traitement des données de paiement</h2>
-          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80 space-y-3">
+          <h2 className="text-2xl font-bold text-sapin mb-4">10. Traitement des données de paiement</h2>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sapin/80 space-y-3">
             <div>
-              <p className="font-semibold text-sapin mb-2">Modèle économique de la plateforme</p>
-              <ul className="list-disc list-inside text-sapin/70 space-y-1">
+              <p className="font-semibold text-base text-sapin mb-2">Modèle économique de la plateforme</p>
+              <ul className="list-disc list-inside text-base text-sapin/70 space-y-1">
                 <li><strong>Associations :</strong> abonnement annuel avec période d'essai gratuite de 6 mois, géré via Stripe.</li>
                 <li><strong>Commerçants :</strong> commission de 10 % prélevée automatiquement par Stripe à chaque validation de collecte.</li>
               </ul>
@@ -283,8 +273,8 @@ export default function PolitiqueDeConfidentialite() {
             </p>
             <p className="text-sapin/70">
               En cas de litige ou d'anomalie de facturation, contactez-nous à{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin/70 transition-colors">
+                contact@recolteo.fr
               </a>.
             </p>
           </div>
@@ -293,10 +283,10 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={1.9}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">12. Vos droits</h2>
+          <h2 className="text-2xl font-bold text-sapin mb-4">11. Vos droits</h2>
           <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 mb-4">
-            <p className="text-sm text-sapin/80 mb-3">Conformément au RGPD, vous disposez des droits suivants :</p>
-            <ul className="list-disc list-inside text-sm text-sapin/70 space-y-1">
+            <p className="text-base text-sapin/80 mb-3">Conformément au RGPD, vous disposez des droits suivants :</p>
+            <ul className="list-disc list-inside text-base text-sapin/70 space-y-1">
               <li>Droit d'accès à vos données (Art. 15)</li>
               <li>Droit de rectification (Art. 16)</li>
               <li>Droit à l'effacement / « droit à l'oubli » (Art. 17)</li>
@@ -306,14 +296,14 @@ export default function PolitiqueDeConfidentialite() {
               <li>Droit de retirer votre consentement à tout moment</li>
             </ul>
           </div>
-          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80">
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-base text-sapin/80">
             <p className="mb-2">
               Pour exercer vos droits, contactez-nous à :{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors font-semibold">
-                digitalbylucie@gmail.com
+              <a href="mailto:contact@recolteo.fr" className="underline hover:text-sapin/70 transition-colors font-semibold">
+                contact@recolteo.fr
               </a>
             </p>
-            <p className="text-sapin/60 text-xs">
+            <p className="text-sapin/60 text-base">
               Vous pouvez également introduire une réclamation auprès de la{" "}
               <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="underline hover:text-sapin/70 transition-colors">
                 CNIL (www.cnil.fr)
@@ -325,33 +315,19 @@ export default function PolitiqueDeConfidentialite() {
 
       <Reveal delay={2.0}>
         <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">13. Modification de la politique</h2>
-          <p className="text-sm text-sapin/70">
-            Récoltéo se réserve le droit de modifier la présente politique à tout moment. Les utilisateurs
-            seront informés des modifications importantes via la plateforme ou par email. La version en
-            vigueur est celle publiée sur cette page.
-          </p>
-        </section>
-      </Reveal>
-
-      <Reveal delay={2.1}>
-        <section className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-sapin mb-4">14. Contact</h2>
-          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-sm text-sapin/80 space-y-1">
-            <p><strong>Récoltéo</strong> — Responsable : Lucie Curtatone</p>
-            <p><strong>Adresse :</strong> 6 rue du Bac, 38190 Villard Bonnot</p>
+          <h2 className="text-2xl font-bold text-sapin mb-4">12. Modification de la politique</h2>
+          <div className="border border-sapin/10 rounded-2xl p-5 bg-beige/40 text-base text-sapin/80">
             <p>
-              <strong>Email :</strong>{" "}
-              <a href="mailto:digitalbylucie@gmail.com" className="underline hover:text-sapin/70 transition-colors">
-                digitalbylucie@gmail.com
-              </a>
+              Récoltéo se réserve le droit de modifier la présente politique à tout moment. Les utilisateurs
+              seront informés des modifications importantes via la plateforme ou par email. La version en
+              vigueur est celle publiée sur cette page.
             </p>
           </div>
         </section>
       </Reveal>
 
       <Reveal delay={2.2}>
-        <p className="text-xs text-sapin/40 border-t border-sapin/10 pt-6">
+        <p className="text-base text-sapin/40 border-t border-sapin/10 pt-6">
           Politique de confidentialité Récoltéo — juin 2026 — Conforme au RGPD (Règlement UE 2016/679).
         </p>
       </Reveal>
